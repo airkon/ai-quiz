@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#f0a35e" />
+<title>The Kaki Trek</title>
+<style>
+  /* ============================================================
+     THE KAKI TREK — visual style
+     Tropical / warm / playful: jungle greens, sandy tones, sunset.
+     All layout & animation lives here; all COPY lives in the JS
+     DATA object further down. Edit text there, not here.
+     ============================================================ */
+  :root{
+    --jungle-deep:#123a2b;
+    --jungle:#1c6b47;
+    --jungle-mid:#2e8b5c;
+    --leaf:#57b17d;
+    --sand:#f6e7c6;
+    --sand-deep:#ecd6a6;
+    --cream:#fffaf0;
+    --sunset:#ff8a5c;
+    --sunset-deep:#f4693b;
+    --coral:#ff6f61;
+    --gold:#f4b24a;
+    --ink:#2a2018;
+    --ink-soft:#6b5d4d;
+    --card:#fffdf7;
+    --shadow:0 10px 30px rgba(40,25,10,.18);
+    --radius:22px;
+    --radius-sm:16px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:"Trebuchet MS","Segoe UI",Verdana,system-ui,sans-serif;
+    color:var(--ink);
+    font-size:16px;
+    line-height:1.5;
+    /* pleasant sunset backdrop outside the phone column */
+    background:
+      radial-gradient(120% 80% at 50% -10%, #ffd28a 0%, #ff9e6b 32%, #f4693b 62%, #7a3b8f 100%) fixed;
+    min-height:100dvh;
+    display:flex;
+    justify-content:center;
+    align-items:stretch;
+  }
+
+  /* Phone-width app column */
+  #app{
+    width:100%;
+    max-width:430px;
+    min-height:100dvh;
+    background:linear-gradient(180deg,#fffdf7 0%,#fff6e3 100%);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  @media (min-width:520px){
+    body{padding:24px;}
+    #app{min-height:min(880px,calc(100dvh - 48px));border-radius:30px;}
+  }
+
+  /* Stage holds the sliding screens */
+  #stage{position:relative;flex:1;overflow:hidden;}
+  .screen{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    padding:22px 20px 26px;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    transition:transform .35s var(--ease), opacity .35s var(--ease);
+    will-change:transform,opacity;
+  }
+  .pos-center{transform:translateX(0);opacity:1;}
+  .pos-right{transform:translateX(100%);opacity:1;}
+  .pos-left{transform:translateX(-100%);opacity:1;}
+  /* reduced-motion: opacity-only cross-fade */
+  body.rm .screen{transition:opacity .28s ease;transform:none!important;}
+  body.rm .pos-right,body.rm .pos-left{opacity:0;}
+
+  /* ---------- Illustration placeholders ---------- */
+  /* Each is ONE element you can later swap for <img src=...>. */
+  .illo{
+    border:2px dashed var(--jungle-mid);
+    background:repeating-linear-gradient(135deg,rgba(87,177,125,.10) 0 14px,rgba(246,231,198,.35) 14px 28px);
+    border-radius:var(--radius-sm);
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    color:var(--jungle);
+    font-size:13px;font-weight:bold;
+    padding:14px;
+    line-height:1.35;
+  }
+  .illo .illo-id{display:block;font-size:11px;color:var(--sunset-deep);letter-spacing:.04em;margin-bottom:4px;text-transform:uppercase;}
+  .illo-4x3{width:100%;aspect-ratio:4/3;}
+  .illo-1x1{width:60%;aspect-ratio:1/1;margin:0 auto;}
+
+  /* idle bob for story illustrations (waiting screens feel alive) */
+  .bob{animation:bob 3.6s ease-in-out infinite alternate;}
+  @keyframes bob{from{transform:translateY(-3px);}to{transform:translateY(4px);}}
+  body.rm .bob{animation:none;}
+
+  /* ---------- Typography & shared bits ---------- */
+  h1{font-size:34px;line-height:1.1;margin:0 0 8px;color:var(--jungle-deep);}
+  h2{font-size:23px;line-height:1.2;margin:0 0 10px;color:var(--jungle-deep);}
+  p{margin:0 0 14px;}
+  .subtitle{font-size:17px;color:var(--ink-soft);}
+  .chapter{
+    font-size:13px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--sunset-deep);margin-bottom:6px;
+  }
+  .muted{color:var(--ink-soft);font-size:14px;}
+  .tiny{font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+  .grow{flex:1;}
+  .center{text-align:center;}
+
+  /* Buttons */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    width:100%;border:none;cursor:pointer;
+    background:linear-gradient(180deg,var(--sunset) 0%,var(--sunset-deep) 100%);
+    color:#fff;font-size:18px;font-weight:bold;font-family:inherit;
+    padding:16px 20px;border-radius:999px;
+    box-shadow:0 8px 18px rgba(244,105,59,.35);
+    transition:transform .12s var(--ease),box-shadow .12s var(--ease);
+  }
+  .btn:active{transform:scale(.96);box-shadow:0 4px 10px rgba(244,105,59,.3);}
+  .btn.secondary{
+    background:transparent;color:var(--jungle);
+    box-shadow:none;border:2px solid var(--leaf);
+  }
+  .link{
+    background:none;border:none;cursor:pointer;font-family:inherit;
+    color:var(--ink-soft);font-size:14px;text-decoration:underline;
+    padding:8px;margin-top:6px;
+  }
+
+  /* Landing */
+  .landing-body{justify-content:center;text-align:center;gap:6px;}
+  .landing-body .btn{margin-top:22px;}
+
+  /* Story beats */
+  .story-body{justify-content:center;}
+  .story-copy{font-size:18px;line-height:1.55;margin-top:20px;}
+  .rise{opacity:0;animation:rise .5s var(--ease) forwards;}
+  @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  body.rm .rise{animation:fadein .35s ease forwards;}
+  @keyframes fadein{from{opacity:0;}to{opacity:1;}}
+
+  /* ---------- Question screen ---------- */
+  .qtop{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .backarrow{
+    flex:0 0 auto;width:40px;height:40px;border-radius:50%;
+    border:none;background:var(--sand);color:var(--jungle-deep);
+    font-size:20px;cursor:pointer;font-family:inherit;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .12s var(--ease),background .12s;
+  }
+  .backarrow:active{transform:scale(.9);}
+  .backarrow[hidden]{visibility:hidden;}
+  .dots{display:flex;gap:7px;flex:1;justify-content:center;flex-wrap:wrap;}
+  .dot{
+    width:9px;height:9px;border-radius:50%;background:var(--sand-deep);
+    transition:transform .3s var(--ease),background .3s var(--ease);
+  }
+  .dot.done{background:var(--leaf);}
+  .dot.active{background:var(--sunset-deep);transform:scale(1.5);animation:pulse 1.4s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(244,105,59,.5);}50%{box-shadow:0 0 0 6px rgba(244,105,59,0);}}
+  body.rm .dot.active{animation:none;}
+
+  .scenario{font-size:18px;line-height:1.5;margin:2px 0 18px;color:var(--jungle-deep);}
+  .options{display:flex;flex-direction:column;gap:12px;}
+  .opt{
+    text-align:left;font-family:inherit;font-size:16px;line-height:1.45;
+    background:var(--card);border:2px solid var(--sand-deep);
+    border-radius:var(--radius-sm);padding:15px 16px;cursor:pointer;color:var(--ink);
+    position:relative;
+    box-shadow:0 3px 8px rgba(40,25,10,.06);
+    transition:transform .12s var(--ease),border-color .2s var(--ease),
+               opacity .25s var(--ease),background .2s var(--ease),box-shadow .2s;
+    /* cascade-in */
+    opacity:0;animation:cascade .4s var(--ease) forwards;
+  }
+  @keyframes cascade{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  body.rm .opt{animation:fadein .3s ease forwards;}
+  .opt:active{transform:scale(.97);}
+  .opt.selected{
+    border-color:var(--sunset-deep);background:#fff3e6;
+    box-shadow:0 6px 16px rgba(244,105,59,.22);
+  }
+  .opt.pressed{transform:scale(.96);}
+  .opt.dimmed{opacity:.4;}
+  .opt .check{
+    position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:50%;
+    background:var(--sunset-deep);color:#fff;font-size:14px;font-weight:bold;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;transform:scale(.4);transition:opacity .2s var(--ease),transform .2s var(--ease);
+  }
+  .opt.selected .check{opacity:1;transform:scale(1);}
+
+  /* ---------- Tallying screen ---------- */
+  .tally-body{justify-content:center;align-items:center;text-align:center;gap:20px;}
+  .tally-svg{width:100%;max-width:320px;}
+  .trail-guide{fill:none;stroke:var(--sand-deep);stroke-width:3;stroke-linecap:round;stroke-dasharray:1 12;}
+  .trail-draw{fill:none;stroke:var(--sunset-deep);stroke-width:4;stroke-linecap:round;}
+  .walker{fill:var(--jungle);stroke:#fff;stroke-width:2;}
+  .tally-text{font-size:19px;font-weight:bold;color:var(--jungle-deep);}
+
+  /* ---------- Results ---------- */
+  .results-body{gap:4px;}
+  .persona-name{font-size:30px;line-height:1.1;margin:16px 0 6px;color:var(--jungle-deep);text-align:center;
+    opacity:0;animation:stamp .5s var(--ease) .35s forwards;}
+  @keyframes stamp{0%{opacity:0;transform:scale(1.35);}60%{opacity:1;transform:scale(.96);}100%{opacity:1;transform:scale(1);}}
+  body.rm .persona-name{animation:fadein .4s ease .3s forwards;}
+  .persona-desc{font-size:16px;text-align:center;color:var(--ink);margin-bottom:14px;}
+  .card-reveal{opacity:0;animation:reveal .6s cubic-bezier(.34,1.56,.64,1) forwards;}
+  @keyframes reveal{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
+  body.rm .card-reveal{animation:fadein .4s ease forwards;}
+  .aisa{
+    background:var(--sand);border-radius:var(--radius-sm);padding:14px 16px;
+    font-size:15px;color:var(--ink);margin:6px 0 16px;
+  }
+  .tipbox{
+    background:linear-gradient(180deg,#eafaf0,#dff3e6);
+    border:2px solid var(--leaf);border-radius:var(--radius-sm);
+    padding:14px 16px;margin-bottom:14px;
+  }
+  .tipbox h3{margin:0 0 8px;font-size:15px;color:var(--jungle-deep);text-transform:uppercase;letter-spacing:.04em;}
+  .tipbox .tip{font-size:15px;margin:0 0 10px;}
+  .tipbox .tip:last-child{margin-bottom:0;}
+  .tip .tip-dim{font-weight:bold;color:var(--jungle);}
+  .fineprint{margin:8px 0 18px;}
+  .fineprint p{margin-bottom:8px;}
+  .results-body .btn{margin-top:4px;}
+
+  /* Confetti / leaf-fall */
+  #confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5;}
+  .leaf{position:absolute;top:-24px;width:14px;height:14px;border-radius:2px 12px 2px 12px;will-change:transform,opacity;}
+  @keyframes fall{
+    0%{transform:translateY(-24px) rotate(0);opacity:1;}
+    100%{transform:translateY(115vh) rotate(540deg);opacity:0;}
+  }
+</style>
+</head>
+<body>
+  <div id="app">
+    <div id="stage"></div>
+    <div id="confetti" aria-hidden="true"></div>
+  </div>
+
+<script>
+/* ================================================================
+   ALL EDITABLE CONTENT LIVES IN THIS ONE OBJECT.
+   Change copy, questions, options, scores, personas and tips here
+   without touching the app logic below it.
+
+   - Each question has a `dimension` and 4 `options`.
+   - Each option has `text` and a `score` (1–4). Scores are tied to
+     the option's content, not its on-screen position (order is
+     randomized each playthrough).
+   ================================================================ */
+const DATA = {
+
+  landing:{
+    illo:{ id:"ill-landing", desc:"island scene / trek title art" },
+    title:"The Kaki Trek",
+    subtitle:"An island adventure. Also, secretly, an AI fluency check.",
+    button:"Start"
+  },
+
+  // Three story beats before the questions.
+  story:[
+    {
+      illo:{ id:"ill-story-boat", desc:"bumboat arriving at jetty" },
+      copy:"The bumboat drops you off at the jetty of Pulau Senja, a little island of jungle, mangrove, and one very tall hill. You have eight days to cross the island and reach the top.",
+      showSkip:true
+    },
+    {
+      illo:{ id:"ill-story-pack", desc:"backpack with kaya toast, paper map, Kaki gadget" },
+      copy:"Inside your pack: some kaya toast for the road, a trusty paper map, and one piece of new equipment called Kaki, an AI-powered trail gadget. (And yes, it's a machine, not a friend. The name just stuck.)"
+    },
+    {
+      illo:{ id:"ill-story-kaki", desc:"the Kaki gadget scanning a route" },
+      copy:"Kaki can scan routes, draft plans, and flag trouble ahead. How much you rely on it is entirely up to you. There are no wrong answers, so just pick what you would actually do. The boat isn't coming back. Walk lor!",
+      sub:"8 quick scenarios · about 3 minutes"
+    }
+  ],
+
+  // 8 questions. Dimensions pair up: Delegation Q1-2, Description Q3-4,
+  // Discernment Q5-6, Diligence Q7-8.
+  questions:[
+    {
+      chapter:"Chapter 1 — The jetty",
+      dimension:"Delegation",
+      scenario:"It's day one, and you need a route across the island. Kaki's route-scan can chart a path in seconds. How do you plan today's route?",
+      options:[
+        { text:"You run the scan and follow whatever route it draws. Kaki probably knows best, so you just start walking.", score:1 },
+        { text:"You stick to your paper map, like you always do. The scan is probably useful, but you've never actually tried it out.", score:2 },
+        { text:"You run the scan for the main path, but a few stretches look a bit dodgy to you, so you plan those parts yourself based on gut feel.", score:3 },
+        { text:"You let the scan handle the flat, straightforward stretches, but plan the steep hill climb yourself. You've learnt what Kaki is good at, and steep ground isn't it.", score:4 }
+      ]
+    },
+    {
+      chapter:"Chapter 2 — The mangrove crossing",
+      dimension:"Delegation",
+      scenario:"A wide mangrove channel blocks the way, too deep to wade across. Kaki can generate a step-by-step plan for building a raft from what's around you. What do you do?",
+      options:[
+        { text:"You follow Kaki's build plan step by step, lash everything together exactly as described, and push off straight away. The plan looked confident, and Kaki has been right before.", score:1 },
+        { text:"You skip the plan completely and build the raft by hand, the way you learnt in NS. Machines don't know rafts.", score:2 },
+        { text:"You follow Kaki's plan as written, then test the finished raft in the shallows yourself before anyone climbs on.", score:3 },
+        { text:"You adjust the plan to fit the gear your team actually brought, then test it in the shallows first.", score:4 }
+      ]
+    },
+    {
+      chapter:"Chapter 3 — Making camp",
+      dimension:"Description",
+      scenario:"The sun is setting and you need Kaki to find tonight's campsite. What do you type into it?",
+      options:[
+        { text:"\"Please find me a really nice spot to camp tonight, somewhere good, you know what I mean, thanks!\"", score:1 },
+        { text:"\"Find a campsite somewhere near the trail.\"", score:2 },
+        { text:"\"Find a flat campsite near fresh water.\"", score:3 },
+        { text:"\"Find a flat campsite near fresh water, sheltered from wind. We have two tents.\"", score:4 }
+      ]
+    },
+    {
+      chapter:"Chapter 4 — Rocky ground",
+      dimension:"Description",
+      scenario:"You hike to Kaki's recommended campsite, but the ground turns out far too rocky to pitch a tent. What do you do?",
+      options:[
+        { text:"You pitch the tent there anyway and spend the night rolling around on rocks. Kaki chose this spot, so it must be the best one available.", score:1 },
+        { text:"You ask Kaki to find another spot, and keep asking until one works out.", score:2 },
+        { text:"You ask Kaki for a few other options and pick whichever looks most promising to you.", score:3 },
+        { text:"You tell Kaki the ground here was too rocky so it knows what to avoid, then ask again.", score:4 }
+      ]
+    },
+    {
+      chapter:"Chapter 5 — The jungle fruit",
+      dimension:"Discernment",
+      scenario:"Deep in the forest, Kaki scans a cluster of unfamiliar fruit and reports that they're safe to eat. What do you do?",
+      options:[
+        { text:"You eat them straight away. Kaki scanned them and said safe, so that settles it.", score:1 },
+        { text:"You give them a good look and a careful sniff yourself, and they seem perfectly fine to you, so you go ahead and eat them.", score:2 },
+        { text:"You check the fruit against your own field guide before eating anything.", score:3 },
+        { text:"You check the field guide, and remember Kaki's scanner has mixed up similar-looking fruit before.", score:4 }
+      ]
+    },
+    {
+      chapter:"Chapter 6 — Off course",
+      dimension:"Discernment",
+      scenario:"Unknown to you, Kaki's compass glitches after breakfast and starts pointing you down the wrong trail. When do you catch it?",
+      options:[
+        { text:"Not until much later, when you reach a landmark that's clearly on the wrong side of the island. That mistake costs you half a day of walking.", score:1 },
+        { text:"Something feels a bit off partway through, but the compass says you're fine, so you keep walking a while more before checking.", score:2 },
+        { text:"Fairly quickly. The terrain stops matching your paper map, so you stop and double-check.", score:3 },
+        { text:"Almost immediately. You've been glancing between Kaki's bearing and the sun out of habit.", score:4 }
+      ]
+    },
+    {
+      chapter:"Chapter 7 — The hilltop",
+      dimension:"Diligence",
+      scenario:"You finally reach the top of the island's one very tall hill, and send your trek report to the expedition group chat. How do you describe the journey?",
+      options:[
+        { text:"You write up the whole journey as your own navigation work from start to finish, and Kaki doesn't appear anywhere in it.", score:1 },
+        { text:"You keep the report simple, and you'll explain Kaki's role honestly if anyone in the group asks.", score:2 },
+        { text:"You mention that Kaki helped with the route, though you don't go into much detail.", score:3 },
+        { text:"You note which stretches Kaki mapped and which parts you checked and navigated yourself.", score:4 }
+      ]
+    },
+    {
+      chapter:"Chapter 8 — The data prompt",
+      dimension:"Diligence",
+      scenario:"On the last morning, a prompt pops up on Kaki's screen: allow it to upload your GPS trail and photos to help improve future treks?",
+      options:[
+        { text:"You tap \"Allow all\" without reading further, and off everything goes.", score:1 },
+        { text:"You allow the basic stuff, since sharing a bit of data seems harmless, and you'd rather not read through the whole permissions list.", score:2 },
+        { text:"You go through exactly what Kaki wants to upload, and hold back anything personal.", score:3 },
+        { text:"You check the expedition's data rules first, then decide what Kaki is allowed to share.", score:4 }
+      ]
+    }
+  ],
+
+  // Tally interstitial copy.
+  tally:{ text:"Adding up your trail…" },
+
+  // Personas keyed by total-score range (8–32). illo id maps to persona.
+  personas:[
+    { min:8,  max:12, illo:"ill-persona-1", name:"The Jetty Chiller",   tier:"Beginner",
+      desc:"Still enjoying the sea breeze at the jetty. You know Kaki is in the pack and roughly what it does, but it hasn't really become part of how you travel yet. No shame in that, every trek starts here." },
+    { min:13, max:16, illo:"ill-persona-2", name:"The Day-tripper",      tier:"Emerging",
+      desc:"You head out for the easy, familiar trails. You reach for Kaki now and then, usually for quick, low-stakes stretches, but it isn't a steady habit yet." },
+    { min:17, max:20, illo:"ill-persona-3", name:"The Trail Runner",     tier:"Proficient",
+      desc:"You cover real ground, reliably. Kaki is a regular part of your kit, and you're productive out there even before pushing into tougher terrain." },
+    { min:21, max:24, illo:"ill-persona-4", name:"The Route Planner",    tier:"Proficient",
+      desc:"You check the map before trusting the path. You brief Kaki clearly, adjust the route deliberately, and double-check what it finds before committing to it." },
+    { min:25, max:28, illo:"ill-persona-5", name:"The Expedition Lead",  tier:"Advanced",
+      desc:"You plan the whole journey, not just the next step. You build the trip with Kaki rather than just asking it questions, and you have habits in place to catch it when something's off." },
+    { min:29, max:32, illo:"ill-persona-6", name:"The Trailblazer",      tier:"Advanced",
+      desc:"You cut paths that others end up following. You work near the edge of what's possible out here, with Kaki fully embedded in the journey and responsibly handled." }
+  ],
+
+  // AISA tier line ({tier} is filled from the persona).
+  aisaLine:"On AISA's AI fluency spectrum, this lands you somewhere around the {tier} tier. Loosely, lah. Eight jungle questions can only tell you so much.",
+
+  // Growth tip shown for the LOWEST-scoring dimension.
+  tipHeading:"One thing to pack for your next trek",
+  tips:{
+    Delegation:"Before your next task, pause and ask: could AI take a useful first pass at this? Pick one recurring task this week and hand it over deliberately.",
+    Description:"Try writing your next AI request like a short brief: the context, the constraints, and what 'done' looks like, before you hit send.",
+    Discernment:"Next time AI gives you something that matters, check one fact or figure against a second source before you use it.",
+    Diligence:"Before AI-assisted work goes out the door, build in two small habits: a quick quality check, and a quick note on where AI was involved."
+  },
+
+  finePrint:[
+    "The island adventure is a fun costume for Anthropic's AI Fluency Framework: Delegation, Description, Discernment and Diligence, the four habits that shape how well any of us work with AI. The AISA tier is a rough, just-for-fun estimate; the real AISA assessment is a 20-minute conversation, not eight questions about jungle fruit. This self-check is light-touch, not a formal assessment.",
+  ],
+
+  walkAgain:"Walk again"
+};
+
+/* ================================================================
+   APP LOGIC — no copy below this line.
+   ================================================================ */
+const RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(RM) document.body.classList.add("rm");
+
+const stage = document.getElementById("stage");
+
+const state = {
+  qIndex:0,
+  answers:[],   // score per question (1–4), or null
+  order:[],     // per-question shuffled option arrays
+  busy:false
+};
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+// Fresh run: reset answers and re-randomize option order.
+function buildRun(){
+  state.qIndex = 0;
+  state.answers = new Array(DATA.questions.length).fill(null);
+  state.order = DATA.questions.map(q => shuffle(q.options));
+}
+
+// Slide a new screen in. dir: 'fwd' (default) or 'back'.
+function transitionTo(node, dir){
+  if(state.busy) return;
+  node.classList.add("screen");
+  const old = stage.querySelector(".screen");
+
+  if(!old){
+    node.classList.add("pos-center");
+    stage.appendChild(node);
+    return;
+  }
+
+  state.busy = true;
+  const incomingStart = dir === "back" ? "pos-left" : "pos-right";
+  const outgoingEnd   = dir === "back" ? "pos-right" : "pos-left";
+
+  node.classList.add(incomingStart);
+  stage.appendChild(node);
+
+  // force reflow so the start position is committed before we animate
+  void node.offsetWidth;
+
+  // Move to center. Driven by rAF, but a timer fallback guarantees the
+  // screen settles even if rAF is throttled (backgrounded/hidden tab).
+  let moved = false;
+  const move = ()=>{
+    if(moved) return;
+    moved = true;
+    node.classList.remove(incomingStart);
+    node.classList.add("pos-center");
+    old.classList.remove("pos-center");
+    old.classList.add(outgoingEnd);
+  };
+  requestAnimationFrame(()=> requestAnimationFrame(move));
+  setTimeout(move, 60);
+
+  // Clean up the outgoing screen once the slide ends (with timer fallback).
+  let cleaned = false;
+  const done = ()=>{
+    if(cleaned) return;
+    cleaned = true;
+    old.remove();
+    state.busy = false;
+  };
+  old.addEventListener("transitionend", done, {once:true});
+  setTimeout(done, 700);
+}
+
+// ---- Illustration placeholder builder ----
+function makeIllo(illo, shape, extraClass){
+  const d = document.createElement("div");
+  d.className = "illo illo-" + shape + (extraClass ? " " + extraClass : "");
+  d.innerHTML = '<span><span class="illo-id">'+illo.id+'</span>'+illo.desc+'</span>';
+  return d;
+}
+
+// ---- Screen: Landing ----
+function renderLanding(dir){
+  const s = document.createElement("div");
+  s.className = "landing-body";
+  s.style.cssText = "";
+  s.append(makeIllo(DATA.landing.illo,"4x3"));
+
+  const h = document.createElement("h1"); h.textContent = DATA.landing.title;
+  const sub = document.createElement("p"); sub.className = "subtitle"; sub.textContent = DATA.landing.subtitle;
+  const btn = document.createElement("button"); btn.className = "btn"; btn.textContent = DATA.landing.button;
+  btn.onclick = ()=> renderStory(0,"fwd");
+
+  const wrap = document.createElement("div");
+  wrap.append(h, sub, btn);
+  s.append(wrap);
+  transitionTo(s, dir || "fwd");
+}
+
+// ---- Screen: Story beat ----
+function renderStory(i, dir){
+  const beat = DATA.story[i];
+  const s = document.createElement("div");
+  s.className = "story-body";
+
+  const illo = makeIllo(beat.illo,"4x3","bob rise");
+  const copy = document.createElement("p");
+  copy.className = "story-copy rise";
+  copy.style.animationDelay = "0.12s";
+  copy.textContent = beat.copy;
+
+  s.append(illo, copy);
+
+  if(beat.sub){
+    const sub = document.createElement("p");
+    sub.className = "muted center rise";
+    sub.style.animationDelay = "0.2s";
+    sub.style.marginTop = "16px";
+    sub.textContent = beat.sub;
+    s.append(sub);
+  }
+
+  const spacer = document.createElement("div");
+  spacer.className = "grow";
+  s.append(spacer);
+
+  const btn = document.createElement("button");
+  btn.className = "btn rise";
+  btn.style.animationDelay = "0.24s";
+  btn.textContent = "Continue";
+  btn.onclick = ()=>{
+    if(i < DATA.story.length - 1) renderStory(i+1,"fwd");
+    else renderQuestion(0,"fwd");
+  };
+  s.append(btn);
+
+  if(beat.showSkip){
+    const skip = document.createElement("button");
+    skip.className = "link center";
+    skip.style.alignSelf = "center";
+    skip.textContent = "Skip intro";
+    skip.onclick = ()=> renderQuestion(0,"fwd");
+    s.append(skip);
+  }
+
+  transitionTo(s, dir || "fwd");
+}
+
+// ---- Screen: Question ----
+function renderQuestion(i, dir){
+  state.qIndex = i;
+  const q = DATA.questions[i];
+  const opts = state.order[i];
+  const s = document.createElement("div");
+
+  // top row: back arrow + progress dots
+  const top = document.createElement("div");
+  top.className = "qtop";
+  const back = document.createElement("button");
+  back.className = "backarrow";
+  back.setAttribute("aria-label","Go back");
+  back.innerHTML = "&#8592;";
+  back.onclick = ()=>{
+    if(i > 0) renderQuestion(i-1,"back");
+    else renderStory(DATA.story.length-1,"back");
+  };
+  const dots = document.createElement("div");
+  dots.className = "dots";
+  for(let d=0; d<DATA.questions.length; d++){
+    const dot = document.createElement("span");
+    dot.className = "dot";
+    if(d < i) dot.classList.add("done");
+    if(d === i) dot.classList.add("active");
+    dots.append(dot);
+  }
+  top.append(back, dots);
+  s.append(top);
+
+  const chap = document.createElement("div");
+  chap.className = "chapter";
+  chap.textContent = "Q" + (i+1) + " · " + q.chapter;
+  const scen = document.createElement("p");
+  scen.className = "scenario";
+  scen.textContent = q.scenario;
+  s.append(chap, scen);
+
+  const list = document.createElement("div");
+  list.className = "options";
+  const cards = [];
+  opts.forEach((opt, idx)=>{
+    const c = document.createElement("button");
+    c.className = "opt";
+    c.style.animationDelay = (idx*0.07) + "s";
+    c.innerHTML = '<span class="check">&#10003;</span>';
+    const txt = document.createElement("span");
+    txt.textContent = opt.text;
+    c.append(txt);
+    // reflect a previously chosen answer (so back-arrow shows the pick)
+    if(state.answers[i] === opt.score) c.classList.add("selected");
+    c.onclick = ()=> selectOption(c, opt, cards, i);
+    cards.push(c);
+    list.append(c);
+  });
+  s.append(list);
+
+  transitionTo(s, dir || "fwd");
+}
+
+function selectOption(card, opt, cards, i){
+  if(state.busy) return;
+  state.answers[i] = opt.score;
+
+  cards.forEach(c=> c.classList.remove("selected"));
+  card.classList.add("pressed");
+  card.classList.add("selected");
+  cards.forEach(c=>{ if(c!==card) c.classList.add("dimmed"); });
+  card.addEventListener("animationend",()=>card.classList.remove("pressed"),{once:true});
+  setTimeout(()=> card.classList.remove("pressed"), 160);
+
+  // ~400ms highlight, then auto-advance
+  setTimeout(()=>{
+    if(i < DATA.questions.length - 1) renderQuestion(i+1,"fwd");
+    else renderTally();
+  }, 420);
+}
+
+// ---- Screen: Tallying interstitial ----
+function renderTally(){
+  const s = document.createElement("div");
+  s.className = "tally-body";
+
+  const D = "M20 96 C 70 30, 120 30, 160 74 S 250 104, 300 44";
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns,"svg");
+  svg.setAttribute("viewBox","0 0 320 130");
+  svg.setAttribute("class","tally-svg");
+
+  const guide = document.createElementNS(ns,"path");
+  guide.setAttribute("d",D);
+  guide.setAttribute("class","trail-guide");
+
+  const draw = document.createElementNS(ns,"path");
+  draw.setAttribute("d",D);
+  draw.setAttribute("class","trail-draw");
+
+  const walker = document.createElementNS(ns,"circle");
+  walker.setAttribute("r","7");
+  walker.setAttribute("class","walker");
+
+  svg.append(guide, draw, walker);
+  s.append(svg);
+
+  const txt = document.createElement("div");
+  txt.className = "tally-text";
+  txt.textContent = DATA.tally.text;
+  s.append(txt);
+
+  transitionTo(s, "fwd");
+
+  // Animate the trail drawing + walker moving along it.
+  const L = draw.getTotalLength();
+  const DUR = 1500;
+  if(RM){
+    draw.style.strokeDasharray = "none";
+    const end = draw.getPointAtLength(L);
+    walker.setAttribute("cx", end.x);
+    walker.setAttribute("cy", end.y);
+    setTimeout(()=> renderResults("fwd"), DUR);
+    return;
+  }
+
+  draw.style.strokeDasharray = L;
+  draw.style.strokeDashoffset = L;
+  const start = performance.now();
+  function frame(now){
+    const t = Math.min(1,(now-start)/DUR);
+    const eased = 1 - Math.pow(1-t,2);   // ease-out
+    draw.style.strokeDashoffset = L*(1-eased);
+    const p = draw.getPointAtLength(L*eased);
+    walker.setAttribute("cx", p.x);
+    walker.setAttribute("cy", p.y);
+    if(t < 1) requestAnimationFrame(frame);
+    else renderResults("fwd");
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---- Scoring ----
+function computeResults(){
+  const a = state.answers;
+  const total = a.reduce((x,y)=> x + (y||0), 0);
+
+  // dimension subscores from the question definitions
+  const dims = {};
+  DATA.questions.forEach((q,idx)=>{
+    dims[q.dimension] = (dims[q.dimension]||0) + (a[idx]||0);
+  });
+
+  const persona = DATA.personas.find(p => total >= p.min && total <= p.max)
+                || DATA.personas[DATA.personas.length-1];
+
+  // lowest-scoring dimension(s); show up to two on a tie
+  const min = Math.min(...Object.values(dims));
+  const lowDims = Object.keys(dims).filter(k => dims[k] === min).slice(0,2);
+
+  return { total, dims, persona, lowDims };
+}
+
+// ---- Screen: Results ----
+function renderResults(dir){
+  const r = computeResults();
+  const s = document.createElement("div");
+  s.className = "results-body";
+
+  const card = document.createElement("div");
+  card.className = "card-reveal";
+
+  card.append(makeIllo({id:r.persona.illo, desc:"persona portrait"}, "1x1"));
+
+  const name = document.createElement("div");
+  name.className = "persona-name";
+  name.textContent = r.persona.name;
+  card.append(name);
+
+  const desc = document.createElement("p");
+  desc.className = "persona-desc";
+  desc.textContent = r.persona.desc;
+  card.append(desc);
+
+  const aisa = document.createElement("div");
+  aisa.className = "aisa";
+  aisa.textContent = DATA.aisaLine.replace("{tier}", r.persona.tier);
+  card.append(aisa);
+
+  const tip = document.createElement("div");
+  tip.className = "tipbox";
+  const th = document.createElement("h3");
+  th.textContent = DATA.tipHeading;
+  tip.append(th);
+  r.lowDims.forEach(dim=>{
+    const p = document.createElement("p");
+    p.className = "tip";
+    p.innerHTML = '<span class="tip-dim">'+dim+':</span> ';
+    p.append(document.createTextNode(DATA.tips[dim]));
+    tip.append(p);
+  });
+  card.append(tip);
+
+  const fine = document.createElement("div");
+  fine.className = "fineprint";
+  DATA.finePrint.forEach(t=>{
+    const p = document.createElement("p");
+    p.className = "tiny";
+    p.textContent = t;
+    fine.append(p);
+  });
+  card.append(fine);
+
+  s.append(card);
+
+  const btn = document.createElement("button");
+  btn.className = "btn";
+  btn.textContent = DATA.walkAgain;
+  btn.onclick = ()=>{ buildRun(); renderLanding("back"); };
+  s.append(btn);
+
+  transitionTo(s, dir || "fwd");
+
+  // one-off leaf-fall burst
+  if(!RM) leafBurst();
+}
+
+// ---- Confetti / leaf-fall (pure JS, ~1.5s) ----
+function leafBurst(){
+  const layer = document.getElementById("confetti");
+  const colors = ["#57b17d","#2e8b5c","#f4b24a","#ff8a5c","#ff6f61","#1c6b47"];
+  const N = 22;
+  for(let i=0;i<N;i++){
+    const el = document.createElement("div");
+    el.className = "leaf";
+    const left = Math.random()*100;
+    const dur = 1200 + Math.random()*600;
+    const delay = Math.random()*300;
+    el.style.left = left + "%";
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.animation = "fall " + dur + "ms ease-in " + delay + "ms forwards";
+    el.style.transform = "translateY(-24px)";
+    layer.append(el);
+    setTimeout(()=> el.remove(), dur + delay + 60);
+  }
+}
+
+// ---- Boot ----
+buildRun();
+renderLanding();
+</script>
+</body>
+</html>
