@@ -71,6 +71,23 @@
     #app{min-height:min(880px,calc(100dvh - 48px));border-radius:30px;}
   }
 
+  /* Portrait-only: on landscape phones, hide the app and ask to rotate.
+     Gated on a short height so desktop/tablet landscape is unaffected. */
+  #rotate{display:none;}
+  @media (orientation:landscape) and (max-height:600px){
+    #app{display:none;}
+    #rotate{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      position:fixed;inset:0;z-index:100;text-align:center;padding:24px;color:#fff;
+      background:radial-gradient(120% 90% at 50% -10%, #ffd28a 0%, #ff9e6b 32%, #f4693b 62%, #7a3b8f 100%);
+    }
+  }
+  .rotate-icon{font-size:56px;animation:rotatehint 2.4s ease-in-out infinite;}
+  @keyframes rotatehint{0%,55%,100%{transform:rotate(0);}25%,40%{transform:rotate(-90deg);}}
+  body.rm .rotate-icon{animation:none;}
+  .rotate-title{font-size:22px;font-weight:bold;margin-top:16px;text-shadow:2px 2px 0 rgba(51,37,26,.35);}
+  .rotate-sub{font-family:var(--mono);font-size:14px;margin-top:8px;opacity:.92;letter-spacing:.03em;}
+
   /* Stage holds the sliding screens */
   #stage{position:relative;flex:1;overflow:hidden;}
   .screen{
@@ -302,6 +319,13 @@
   <div id="app">
     <div id="stage"></div>
     <div id="confetti" aria-hidden="true"></div>
+  </div>
+
+  <!-- Shown only on landscape phones; the trek is designed portrait-only. -->
+  <div id="rotate">
+    <div class="rotate-icon">📱</div>
+    <div class="rotate-title">Turn your phone upright</div>
+    <div class="rotate-sub">The Kaki Trek walks best in portrait.</div>
   </div>
 
 <script>
