@@ -254,14 +254,6 @@
   }
   .opt.pressed{transform:translate(2px,2px);}
   .opt.dimmed{opacity:.4;}
-  .opt .check{
-    position:absolute;top:11px;right:11px;width:24px;height:24px;border-radius:4px;
-    border:2px solid var(--edge);
-    background:var(--sunset-deep);color:#fff;font-size:14px;font-weight:bold;
-    display:flex;align-items:center;justify-content:center;
-    opacity:0;transform:scale(.4);transition:opacity .15s steps(2),transform .15s steps(2);
-  }
-  .opt.selected .check{opacity:1;transform:scale(1);}
 
   /* ---------- Tallying screen ---------- */
   .tally-content{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;
@@ -814,7 +806,6 @@ function renderQuestion(i, dir){
     const c = document.createElement("button");
     c.className = "opt";
     c.style.animationDelay = (idx*0.07) + "s";
-    c.innerHTML = '<span class="check">&#10003;</span>';
     const txt = document.createElement("span");
     txt.textContent = opt.text;
     c.append(txt);
