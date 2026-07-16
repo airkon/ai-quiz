@@ -175,6 +175,8 @@
     padding:20px 16px calc(22px + env(safe-area-inset-bottom));}
   .floatcard{margin-top:auto;background:var(--card);border:3px solid var(--edge);
     border-radius:14px;padding:22px 20px;box-shadow:6px 6px 0 rgba(51,37,26,.85);}
+  /* back arrow floating over a hero background (story screens) */
+  .top-back{position:absolute;top:calc(16px + env(safe-area-inset-top));left:16px;z-index:3;}
   .floatcard h1{margin:0 0 8px;}
   .floatcard .subtitle{margin:0;}
   .floatcard .btn{margin-top:18px;}
@@ -619,6 +621,16 @@ function renderStory(i, dir){
   const scrim = document.createElement("div");
   scrim.className = "scrim";
 
+  // Back arrow: step back through the beats, or return to the landing.
+  const back = document.createElement("button");
+  back.className = "backarrow top-back";
+  back.setAttribute("aria-label","Go back");
+  back.innerHTML = "&#8592;";
+  back.onclick = ()=>{
+    if(i > 0) renderStory(i-1,"back");
+    else renderLanding("back");
+  };
+
   const content = document.createElement("div");
   content.className = "hero-content";
   const card = document.createElement("div");
@@ -660,7 +672,7 @@ function renderStory(i, dir){
   }
 
   content.append(card);
-  s.append(bg, scrim, content);
+  s.append(bg, scrim, back, content);
   transitionTo(s, dir || "fwd");
 }
 
