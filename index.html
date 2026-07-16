@@ -297,13 +297,8 @@
     opacity:0;animation:stamp .5s var(--ease) .35s forwards;}
   @keyframes stamp{0%{opacity:0;transform:scale(1.35);}60%{opacity:1;transform:scale(.96);}100%{opacity:1;transform:scale(1);}}
   body.rm .persona-name{animation:fadein .4s ease .3s forwards;}
-  /* AISA fluency badge (replaces the old tan tier box) + one hedge line */
-  .aisa-badge-wrap{text-align:center;margin:2px 0 6px;}
-  .aisa-badge{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:bold;
-    letter-spacing:.04em;color:var(--jungle-deep);background:var(--sand);
-    border:2px solid var(--edge);border-radius:999px;padding:5px 14px;box-shadow:3px 3px 0 rgba(51,37,26,.35);}
-  .aisa-hedge{font-size:13px;font-style:italic;color:var(--ink-soft);text-align:center;margin:0 0 16px;}
-  .persona-desc{font-size:16px;line-height:1.55;text-align:left;color:var(--ink);margin:0 0 18px;}
+  .persona-desc{font-size:16px;line-height:1.55;text-align:left;color:var(--ink);margin:8px 0 18px;}
+  .results-card .btn + .btn{margin-top:10px;}
   .card-reveal{opacity:0;animation:reveal .6s cubic-bezier(.34,1.56,.64,1) forwards;}
   @keyframes reveal{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
   body.rm .card-reveal{animation:fadein .4s ease forwards;}
@@ -321,10 +316,27 @@
   /* Footer: framework line, course link, one-line disclaimer */
   .results-footer{margin:2px 0 16px;}
   .footer-line{font-size:15px;line-height:1.5;color:var(--ink);margin:0 0 8px;}
-  .footer-link{display:inline-block;font-size:15px;font-weight:bold;color:var(--cta);
-    text-decoration:none;margin:0 0 12px;}
-  .footer-link:hover{text-decoration:underline;}
   .footer-disclaimer{font-size:13px;color:var(--ink-soft);margin:0;}
+
+  /* Overlay: full persona list */
+  .persona-list-overlay{position:absolute;inset:0;z-index:50;overflow-y:auto;
+    background:rgba(30,15,5,.55);padding:24px 16px calc(24px + env(safe-area-inset-bottom));
+    animation:fadein .22s ease;}
+  body.rm .persona-list-overlay{animation:none;}
+  .persona-list{position:relative;background:var(--card);border:3px solid var(--edge);
+    border-radius:14px;padding:22px 20px;box-shadow:6px 6px 0 rgba(51,37,26,.8);}
+  .persona-list-title{font-size:20px;color:var(--jungle-deep);margin:0 0 10px;padding-right:36px;}
+  .persona-list-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:9px;
+    border:2px solid var(--edge);background:var(--sand);color:var(--jungle-deep);font-size:22px;line-height:1;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .pl-item{padding:12px 0;border-bottom:2px solid var(--sand-deep);}
+  .pl-item:last-child{border-bottom:none;padding-bottom:0;}
+  .pl-item.current{background:#fff3e6;margin:0 -20px;padding:12px 20px;}
+  .pl-name{font-weight:bold;font-size:16px;color:var(--jungle-deep);margin:0 0 3px;}
+  .pl-short{font-size:14px;line-height:1.45;color:var(--ink);margin:0;}
+  .pl-you{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:bold;text-transform:uppercase;
+    letter-spacing:.05em;color:#fff;background:var(--cta);border:2px solid var(--edge);border-radius:999px;
+    padding:1px 8px;vertical-align:middle;}
 
   /* Confetti / leaf-fall */
   #confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5;}
@@ -510,22 +522,24 @@ const DATA = {
   // Personas keyed by total-score range (8–32). illo id maps to persona.
   personas:[
     { min:8,  max:12, illo:"ill-persona-1", name:"The Jetty Chiller",   tier:"Beginner",
+      short:"Kaki's in your pack, but it hasn't really become part of how you travel yet.",
       desc:"Still enjoying the sea breeze at the jetty. You know Kaki is in the pack and roughly what it does, but it hasn't really become part of how you travel yet. No shame in that, every trek starts here." },
     { min:13, max:16, illo:"ill-persona-2", name:"The Day-tripper",      tier:"Emerging",
+      short:"You reach for AI now and then, usually for quick, low-stakes stretches.",
       desc:"You head out for the easy, familiar trails. You reach for Kaki now and then, usually for quick, low-stakes stretches, but it isn't a steady habit yet." },
     { min:17, max:20, illo:"ill-persona-3", name:"The Trail Runner",     tier:"Proficient",
+      short:"AI is a regular, reliable part of your kit out on the trail.",
       desc:"You cover real ground, reliably. Kaki is a regular part of your kit, and you're productive out there even before pushing into tougher terrain." },
     { min:21, max:24, illo:"ill-persona-4", name:"The Route Planner",    tier:"Proficient",
+      short:"You brief AI clearly and double-check what it finds before trusting it.",
       desc:"You check the map before trusting the path. You brief Kaki clearly, adjust the route deliberately, and double-check what it finds before committing to it." },
     { min:25, max:28, illo:"ill-persona-5", name:"The Expedition Lead",  tier:"Advanced",
+      short:"You build whole plans with AI and have habits to catch it when it's off.",
       desc:"You plan the whole journey, not just the next step. You build the trip with Kaki rather than just asking it questions, and you have habits in place to catch it when something's off." },
     { min:29, max:32, illo:"ill-persona-6", name:"The Trailblazer",      tier:"Advanced",
+      short:"You work near the edge of what's possible, with AI fully in the loop.",
       desc:"You cut paths that others end up following. You work near the edge of what's possible out here, with Kaki fully embedded in the journey and responsibly handled." }
   ],
-
-  // AISA fluency badge (fills {tier}) + one short hedge line under it.
-  aisaBadge:"≈ AISA {tier}",
-  aisaHedge:"Loosely, lah — eight jungle questions can only tell you so much.",
 
   // Growth tip: shown for the single lowest-scoring dimension.
   tipHeading:"One thing to pack for your next trek",
@@ -538,10 +552,12 @@ const DATA = {
   },
 
   // Results footer.
-  footerFramework:"Based on Anthropic's AI Fluency framework — the 4Ds: Delegation, Description, Discernment, Diligence.",
-  footerLinkText:"Take the free course →",
-  footerLinkHref:"https://www.anthropic.com/ai-fluency",
-  disclaimer:"A light-touch self-check, not a formal assessment.",
+  footerFramework:"This quiz is based on Anthropic's AI Fluency framework — the 4Ds: Delegation, Description, Discernment, Diligence.",
+  disclaimer:"A light-touch self-check.",
+
+  // "See all personas" list.
+  seeAllCta:"See all personas",
+  personaListTitle:"Meet all the trekkers",
 
   walkAgain:"Walk again"
 };
@@ -1004,20 +1020,6 @@ function renderResults(dir){
   name.textContent = r.persona.name;
   card.append(name);
 
-  // SECTION 1 (cont.): AISA fluency badge + one hedge line, then description.
-  const badgeWrap = document.createElement("div");
-  badgeWrap.className = "aisa-badge-wrap";
-  const badge = document.createElement("span");
-  badge.className = "aisa-badge";
-  badge.textContent = DATA.aisaBadge.replace("{tier}", r.persona.tier);
-  badgeWrap.append(badge);
-  card.append(badgeWrap);
-
-  const hedge = document.createElement("p");
-  hedge.className = "aisa-hedge";
-  hedge.textContent = DATA.aisaHedge;
-  card.append(hedge);
-
   const desc = document.createElement("p");
   desc.className = "persona-desc";
   desc.textContent = r.persona.desc;
@@ -1051,17 +1053,17 @@ function renderResults(dir){
   const fLine = document.createElement("p");
   fLine.className = "footer-line";
   fLine.textContent = DATA.footerFramework;
-  const fLink = document.createElement("a");
-  fLink.className = "footer-link";
-  fLink.href = DATA.footerLinkHref;
-  fLink.target = "_blank";
-  fLink.rel = "noopener";
-  fLink.textContent = DATA.footerLinkText;
   const fDis = document.createElement("p");
   fDis.className = "footer-disclaimer";
   fDis.textContent = DATA.disclaimer;
-  footer.append(fLine, fLink, fDis);
+  footer.append(fLine, fDis);
   card.append(footer);
+
+  const seeAll = document.createElement("button");
+  seeAll.className = "btn secondary";
+  seeAll.textContent = DATA.seeAllCta;
+  seeAll.onclick = ()=> showPersonaList(r.persona.illo);
+  card.append(seeAll);
 
   const btn = document.createElement("button");
   btn.className = "btn";
@@ -1076,6 +1078,49 @@ function renderResults(dir){
 
   // one-off leaf-fall burst
   if(!RM) leafBurst();
+}
+
+// ---- Overlay: full list of personas with a short description each ----
+function showPersonaList(currentIllo){
+  const overlay = document.createElement("div");
+  overlay.className = "persona-list-overlay";
+  overlay.onclick = (e)=>{ if(e.target === overlay) overlay.remove(); };
+
+  const card = document.createElement("div");
+  card.className = "persona-list";
+
+  const close = document.createElement("button");
+  close.className = "persona-list-close";
+  close.setAttribute("aria-label","Close");
+  close.innerHTML = "&times;";
+  close.onclick = ()=> overlay.remove();
+
+  const h = document.createElement("h2");
+  h.className = "persona-list-title";
+  h.textContent = DATA.personaListTitle;
+  card.append(close, h);
+
+  DATA.personas.forEach(p=>{
+    const item = document.createElement("div");
+    item.className = "pl-item" + (p.illo === currentIllo ? " current" : "");
+    const name = document.createElement("div");
+    name.className = "pl-name";
+    name.textContent = p.name;
+    if(p.illo === currentIllo){
+      const you = document.createElement("span");
+      you.className = "pl-you";
+      you.textContent = "you";
+      name.append(" ", you);
+    }
+    const short = document.createElement("p");
+    short.className = "pl-short";
+    short.textContent = p.short;
+    item.append(name, short);
+    card.append(item);
+  });
+
+  overlay.append(card);
+  document.getElementById("app").append(overlay);
 }
 
 // ---- Confetti / leaf-fall (pure JS, ~1.5s) ----
