@@ -26,6 +26,22 @@ Illustrations are placeholders: dashed-border boxes labelled with an ID and the
 intended content (e.g. `ill-story-boat`). Each is one element you can later
 swap for an `<img>` without touching anything else.
 
+The hero screens (landing + the three story beats) use a **full-bleed
+background** with a floating cream content card near the bottom, so those
+assets are edge-to-edge (`object-fit: cover`) and their bottom ~45% sits behind
+the card — keep the focal subject in the upper-middle. Questions + the tally
+share one faint background asset (`ill-bg-jungle`). Results uses an
+edge-to-edge persona hero band (`ill-persona-1…6`, subject in the top half)
+with the results card overlapping its bottom edge.
+
+**Asset spec (design at 430px wide, export @2x and @3x):**
+
+| Asset | Where | Treatment |
+|---|---|---|
+| `ill-landing`, `ill-story-boat`, `ill-story-pack`, `ill-story-kaki` | landing + story | full-bleed ~9:19.5; subject upper-middle; bottom ~45% behind card |
+| `ill-bg-jungle` | all 8 questions + tally | one faint/desaturated full-bleed backdrop |
+| `ill-persona-1` … `ill-persona-6` | results | edge-to-edge 4:3 hero band; subject in top half |
+
 ## Design notes
 
 - Mobile-first, ~390px, centered phone column with a sunset backdrop on larger screens.

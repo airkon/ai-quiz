@@ -70,13 +70,20 @@
   #stage{position:relative;flex:1;overflow:hidden;}
   .screen{
     position:absolute;inset:0;
-    display:flex;flex-direction:column;
-    padding:22px 20px 26px;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
+    overflow:hidden;
     transition:transform .35s var(--ease), opacity .35s var(--ease);
     will-change:transform,opacity;
   }
+  /* Full-bleed background layer (edge-to-edge illustration) + soft bottom
+     scrim that grounds the floating card against a busy image. */
+  .screen-bg{position:absolute;inset:0;z-index:0;overflow:hidden;}
+  .scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(to bottom,rgba(0,0,0,0) 42%,rgba(30,15,5,.20) 100%);}
+  /* Faint shared background used behind question + tally content. */
+  .bg-faint{position:absolute;inset:0;z-index:0;overflow:hidden;}
+  .bg-faint .illo{opacity:.28;}
+  .bg-faint::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(255,253,247,.70),rgba(255,246,227,.82));}
   .pos-center{transform:translateX(0);opacity:1;}
   .pos-right{transform:translateX(100%);opacity:1;}
   .pos-left{transform:translateX(-100%);opacity:1;}
@@ -99,11 +106,16 @@
   .illo .illo-id{display:block;font-size:11px;color:var(--sunset-deep);letter-spacing:.04em;margin-bottom:4px;text-transform:uppercase;}
   .illo-4x3{width:100%;aspect-ratio:4/3;}
   .illo-1x1{width:60%;aspect-ratio:1/1;margin:0 auto;}
+  /* full-bleed background placeholder — fills the whole screen */
+  .illo-bleed{width:100%;height:100%;border-radius:0;}
+  /* edge-to-edge hero band placeholder — results persona */
+  .illo-hero{width:100%;aspect-ratio:4/3;border-radius:0;}
 
-  /* idle bob for story illustrations (waiting screens feel alive) */
-  .bob{animation:bob 3.6s ease-in-out infinite alternate;}
-  @keyframes bob{from{transform:translateY(-3px);}to{transform:translateY(4px);}}
-  body.rm .bob{animation:none;}
+  /* Slow Ken Burns idle drift for full-bleed backgrounds. It only ever
+     scales UP, so it never reveals a screen edge. Transform-only, 60fps. */
+  .kenburns{animation:kenburns 16s ease-in-out infinite alternate;transform-origin:50% 38%;}
+  @keyframes kenburns{from{transform:scale(1.05);}to{transform:scale(1.14) translateY(-1.5%);}}
+  body.rm .kenburns{animation:none;transform:none;}
 
   /* ---------- Typography & shared bits ---------- */
   h1{font-size:34px;line-height:1.1;margin:0 0 8px;color:var(--jungle-deep);}
@@ -140,19 +152,29 @@
     padding:8px;margin-top:6px;
   }
 
-  /* Landing */
-  .landing-body{justify-content:center;text-align:center;gap:6px;}
-  .landing-body .btn{margin-top:22px;}
-
-  /* Story beats */
-  .story-body{justify-content:center;}
-  .story-copy{font-size:18px;line-height:1.55;margin-top:20px;}
+  /* Hero screens (landing + story): full-bleed background with a floating
+     card of content pinned near the bottom. Buttons live INSIDE the card.
+     margin-top:auto floats the card down when content is short, and lets it
+     scroll from the top when content is tall (avoids justify-end clipping). */
+  .hero-content{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:20px 16px calc(22px + env(safe-area-inset-bottom));}
+  .floatcard{margin-top:auto;background:var(--card);border-radius:24px;padding:24px 22px;
+    box-shadow:0 14px 36px rgba(40,25,10,.30);}
+  .floatcard h1{margin:0 0 8px;}
+  .floatcard .subtitle{margin:0;}
+  .floatcard .btn{margin-top:18px;}
+  .story-copy{font-size:18px;line-height:1.55;margin:0;}
   .rise{opacity:0;animation:rise .5s var(--ease) forwards;}
   @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
   body.rm .rise{animation:fadein .35s ease forwards;}
   @keyframes fadein{from{opacity:0;}to{opacity:1;}}
 
   /* ---------- Question screen ---------- */
+  /* Faint shared jungle bg behind; padded content scrolls on top; the option
+     cards act as the floating content. */
+  .q-content{position:absolute;inset:0;z-index:1;overflow-y:auto;
+    -webkit-overflow-scrolling:touch;padding:22px 20px 26px;}
   .qtop{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
   .backarrow{
     flex:0 0 auto;width:40px;height:40px;border-radius:50%;
@@ -204,7 +226,8 @@
   .opt.selected .check{opacity:1;transform:scale(1);}
 
   /* ---------- Tallying screen ---------- */
-  .tally-body{justify-content:center;align-items:center;text-align:center;gap:20px;}
+  .tally-content{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;
+    justify-content:center;align-items:center;text-align:center;gap:20px;padding:24px;}
   .tally-svg{width:100%;max-width:320px;}
   .trail-guide{fill:none;stroke:var(--sand-deep);stroke-width:3;stroke-linecap:round;stroke-dasharray:1 12;}
   .trail-draw{fill:none;stroke:var(--sunset-deep);stroke-width:4;stroke-linecap:round;}
@@ -212,8 +235,15 @@
   .tally-text{font-size:19px;font-weight:bold;color:var(--jungle-deep);}
 
   /* ---------- Results ---------- */
-  .results-body{gap:4px;}
-  .persona-name{font-size:30px;line-height:1.1;margin:16px 0 6px;color:var(--jungle-deep);text-align:center;
+  /* Edge-to-edge persona hero band at the top; a floating card overlaps its
+     bottom edge and scrolls. "Walk again" lives at the end of that card. */
+  .results-scroll{position:absolute;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .results-hero{position:relative;width:100%;}
+  .results-card{position:relative;z-index:2;
+    margin:-32px 16px calc(22px + env(safe-area-inset-bottom));
+    background:var(--card);border-radius:24px;padding:24px 20px;
+    box-shadow:0 14px 36px rgba(40,25,10,.22);}
+  .persona-name{font-size:30px;line-height:1.1;margin:4px 0 6px;color:var(--jungle-deep);text-align:center;
     opacity:0;animation:stamp .5s var(--ease) .35s forwards;}
   @keyframes stamp{0%{opacity:0;transform:scale(1.35);}60%{opacity:1;transform:scale(.96);}100%{opacity:1;transform:scale(1);}}
   body.rm .persona-name{animation:fadein .4s ease .3s forwards;}
@@ -236,7 +266,6 @@
   .tip .tip-dim{font-weight:bold;color:var(--jungle);}
   .fineprint{margin:8px 0 18px;}
   .fineprint p{margin-bottom:8px;}
-  .results-body .btn{margin-top:4px;}
 
   /* Confetti / leaf-fall */
   #confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5;}
@@ -384,6 +413,10 @@ const DATA = {
     }
   ],
 
+  // One faint background reused behind every question + the tally screen,
+  // so the walk feels continuous. Swap for a single desaturated image.
+  questionBg:{ id:"ill-bg-jungle", desc:"faint jungle backdrop · shared across all questions" },
+
   // Tally interstitial copy.
   tally:{ text:"Adding up your trail…" },
 
@@ -509,70 +542,90 @@ function makeIllo(illo, shape, extraClass){
   return d;
 }
 
-// ---- Screen: Landing ----
+// ---- Screen: Landing (full-bleed bg + floating card) ----
 function renderLanding(dir){
   const s = document.createElement("div");
-  s.className = "landing-body";
-  s.style.cssText = "";
-  s.append(makeIllo(DATA.landing.illo,"4x3"));
 
-  const h = document.createElement("h1"); h.textContent = DATA.landing.title;
-  const sub = document.createElement("p"); sub.className = "subtitle"; sub.textContent = DATA.landing.subtitle;
-  const btn = document.createElement("button"); btn.className = "btn"; btn.textContent = DATA.landing.button;
+  const bg = document.createElement("div");
+  bg.className = "screen-bg";
+  bg.append(makeIllo(DATA.landing.illo, "bleed", "kenburns"));
+  const scrim = document.createElement("div");
+  scrim.className = "scrim";
+
+  const content = document.createElement("div");
+  content.className = "hero-content";
+  const card = document.createElement("div");
+  card.className = "floatcard";
+
+  const h = document.createElement("h1");
+  h.className = "rise"; h.textContent = DATA.landing.title;
+  const sub = document.createElement("p");
+  sub.className = "subtitle rise"; sub.style.animationDelay = "0.08s";
+  sub.textContent = DATA.landing.subtitle;
+  const btn = document.createElement("button");
+  btn.className = "btn rise"; btn.style.animationDelay = "0.16s";
+  btn.textContent = DATA.landing.button;
   btn.onclick = ()=> renderStory(0,"fwd");
 
-  const wrap = document.createElement("div");
-  wrap.append(h, sub, btn);
-  s.append(wrap);
+  card.append(h, sub, btn);
+  content.append(card);
+  s.append(bg, scrim, content);
   transitionTo(s, dir || "fwd");
 }
 
-// ---- Screen: Story beat ----
+// ---- Screen: Story beat (full-bleed bg + floating card) ----
 function renderStory(i, dir){
   const beat = DATA.story[i];
   const s = document.createElement("div");
-  s.className = "story-body";
 
-  const illo = makeIllo(beat.illo,"4x3","bob rise");
+  const bg = document.createElement("div");
+  bg.className = "screen-bg";
+  bg.append(makeIllo(beat.illo, "bleed", "kenburns"));
+  const scrim = document.createElement("div");
+  scrim.className = "scrim";
+
+  const content = document.createElement("div");
+  content.className = "hero-content";
+  const card = document.createElement("div");
+  card.className = "floatcard";
+
   const copy = document.createElement("p");
   copy.className = "story-copy rise";
-  copy.style.animationDelay = "0.12s";
   copy.textContent = beat.copy;
-
-  s.append(illo, copy);
+  card.append(copy);
 
   if(beat.sub){
     const sub = document.createElement("p");
-    sub.className = "muted center rise";
-    sub.style.animationDelay = "0.2s";
-    sub.style.marginTop = "16px";
+    sub.className = "muted rise";
+    sub.style.animationDelay = "0.06s";
+    sub.style.margin = "12px 0 0";
     sub.textContent = beat.sub;
-    s.append(sub);
+    card.append(sub);
   }
-
-  const spacer = document.createElement("div");
-  spacer.className = "grow";
-  s.append(spacer);
 
   const btn = document.createElement("button");
   btn.className = "btn rise";
-  btn.style.animationDelay = "0.24s";
+  btn.style.animationDelay = "0.14s";
   btn.textContent = "Continue";
   btn.onclick = ()=>{
     if(i < DATA.story.length - 1) renderStory(i+1,"fwd");
     else renderQuestion(0,"fwd");
   };
-  s.append(btn);
+  card.append(btn);
 
   if(beat.showSkip){
     const skip = document.createElement("button");
-    skip.className = "link center";
-    skip.style.alignSelf = "center";
+    skip.className = "link center rise";
+    skip.style.animationDelay = "0.2s";
+    skip.style.display = "block";
+    skip.style.margin = "8px auto 0";
     skip.textContent = "Skip intro";
     skip.onclick = ()=> renderQuestion(0,"fwd");
-    s.append(skip);
+    card.append(skip);
   }
 
+  content.append(card);
+  s.append(bg, scrim, content);
   transitionTo(s, dir || "fwd");
 }
 
@@ -582,6 +635,13 @@ function renderQuestion(i, dir){
   const q = DATA.questions[i];
   const opts = state.order[i];
   const s = document.createElement("div");
+
+  const bg = document.createElement("div");
+  bg.className = "bg-faint";
+  bg.append(makeIllo(DATA.questionBg, "bleed"));
+
+  const content = document.createElement("div");
+  content.className = "q-content";
 
   // top row: back arrow + progress dots
   const top = document.createElement("div");
@@ -604,7 +664,7 @@ function renderQuestion(i, dir){
     dots.append(dot);
   }
   top.append(back, dots);
-  s.append(top);
+  content.append(top);
 
   const chap = document.createElement("div");
   chap.className = "chapter";
@@ -612,7 +672,7 @@ function renderQuestion(i, dir){
   const scen = document.createElement("p");
   scen.className = "scenario";
   scen.textContent = q.scenario;
-  s.append(chap, scen);
+  content.append(chap, scen);
 
   const list = document.createElement("div");
   list.className = "options";
@@ -631,8 +691,9 @@ function renderQuestion(i, dir){
     cards.push(c);
     list.append(c);
   });
-  s.append(list);
+  content.append(list);
 
+  s.append(bg, content);
   transitionTo(s, dir || "fwd");
 }
 
@@ -657,7 +718,13 @@ function selectOption(card, opt, cards, i){
 // ---- Screen: Tallying interstitial ----
 function renderTally(){
   const s = document.createElement("div");
-  s.className = "tally-body";
+
+  const bg = document.createElement("div");
+  bg.className = "bg-faint";
+  bg.append(makeIllo(DATA.questionBg, "bleed"));
+
+  const content = document.createElement("div");
+  content.className = "tally-content";
 
   const D = "M20 96 C 70 30, 120 30, 160 74 S 250 104, 300 44";
   const ns = "http://www.w3.org/2000/svg";
@@ -678,13 +745,14 @@ function renderTally(){
   walker.setAttribute("class","walker");
 
   svg.append(guide, draw, walker);
-  s.append(svg);
+  content.append(svg);
 
   const txt = document.createElement("div");
   txt.className = "tally-text";
   txt.textContent = DATA.tally.text;
-  s.append(txt);
+  content.append(txt);
 
+  s.append(bg, content);
   transitionTo(s, "fwd");
 
   // Animate the trail drawing + walker moving along it.
@@ -740,12 +808,16 @@ function computeResults(){
 function renderResults(dir){
   const r = computeResults();
   const s = document.createElement("div");
-  s.className = "results-body";
+
+  const scroll = document.createElement("div");
+  scroll.className = "results-scroll";
+
+  const hero = document.createElement("div");
+  hero.className = "results-hero";
+  hero.append(makeIllo({id:r.persona.illo, desc:"persona portrait · subject in top half"}, "hero"));
 
   const card = document.createElement("div");
-  card.className = "card-reveal";
-
-  card.append(makeIllo({id:r.persona.illo, desc:"persona portrait"}, "1x1"));
+  card.className = "results-card card-reveal";
 
   const name = document.createElement("div");
   name.className = "persona-name";
@@ -786,13 +858,14 @@ function renderResults(dir){
   });
   card.append(fine);
 
-  s.append(card);
-
   const btn = document.createElement("button");
   btn.className = "btn";
   btn.textContent = DATA.walkAgain;
   btn.onclick = ()=>{ buildRun(); renderLanding("back"); };
-  s.append(btn);
+  card.append(btn);
+
+  scroll.append(hero, card);
+  s.append(scroll);
 
   transitionTo(s, dir || "fwd");
 
