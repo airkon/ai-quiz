@@ -36,6 +36,7 @@
     --sunset-edge:#bd4720;
     --leaf-edge:#2c7a4f;
     --mono:"Courier New",ui-monospace,"SF Mono",Menlo,monospace;
+    --logo-font:"Impact","Haettenschweiler","Arial Narrow Bold","Arial Black",sans-serif;
   }
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -196,6 +197,22 @@
   .floatcard .subtitle{margin:0;}
   .floatcard .btn{margin-top:18px;}
   .story-copy{font-size:18px;line-height:1.55;margin:0;}
+  .landing-blurb{font-size:16px;line-height:1.55;color:var(--ink);margin:0;}
+
+  /* Floating Jumanji-style title logo (landing): gold->red 3D extruded text */
+  .title-logo{width:100%;max-width:330px;margin:2vh auto 0;
+    filter:drop-shadow(0 8px 10px rgba(20,10,0,.4));}
+  .title-logo svg{width:100%;height:auto;display:block;overflow:visible;
+    animation:logofloat 4.5s ease-in-out infinite alternate;}
+  body.rm .title-logo svg{animation:none;}
+  @keyframes logofloat{from{transform:translateY(-4px);}to{transform:translateY(5px);}}
+  .lg-top,.lg-main,.lg-sub{font-family:var(--logo-font);font-weight:900;}
+  .lg-top{font-size:46px;letter-spacing:2px;}
+  .lg-main{font-size:104px;letter-spacing:3px;}
+  .lg-ext{fill:#3a1806;}
+  .lg-face{fill:url(#kakigold);stroke:#2a1206;stroke-width:2px;paint-order:stroke;stroke-linejoin:round;}
+  .lg-sub{font-size:22px;letter-spacing:4px;fill:url(#kakigold);stroke:#2a1206;stroke-width:1.2px;paint-order:stroke;stroke-linejoin:round;}
+
   .rise{opacity:0;animation:rise .5s var(--ease) forwards;}
   @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
   body.rm .rise{animation:fadein .35s ease forwards;}
@@ -337,8 +354,12 @@ const DATA = {
   landing:{
     // To use a real image, add `src`. Remove it to fall back to the placeholder.
     illo:{ id:"ill-landing", desc:"island scene / trek title art", src:"assets/ill-landing.webp" },
-    title:"The Kaki Trek",
-    subtitle:"An island adventure. Also, secretly, an AI fluency check.",
+    // Floating title logo — rendered as a Jumanji-style SVG over the background.
+    logoTop:"TREK WITH",
+    logoMain:"KAKI",
+    logoSub:"AN ISLAND ADVENTURE",
+    // Card blurb: what the quiz actually is.
+    body:"A quick, playful check of how you and AI work together. Eight island scenarios, about three minutes — no wrong answers, just a sense of where you're at and one idea to grow.",
     button:"Start"
   },
 
@@ -613,7 +634,32 @@ function makeIllo(illo, shape, extraClass){
   return d;
 }
 
-// ---- Screen: Landing (full-bleed bg + floating card) ----
+// ---- Floating Jumanji-style title logo (inline SVG) ----
+function makeTitleLogo(){
+  const L = DATA.landing;
+  // stacked offset copies form the 3D extrusion (drawn back-to-front)
+  const ext = (id,n)=>{ let s=""; for(let i=n;i>=1;i--){ s+='<use href="#'+id+'" x="'+(i*0.9).toFixed(1)+'" y="'+(i*0.9).toFixed(1)+'"/>'; } return s; };
+  const wrap = document.createElement("div");
+  wrap.className = "title-logo rise";
+  wrap.innerHTML =
+    '<svg viewBox="0 0 400 205" role="img" aria-label="'+L.logoTop+' '+L.logoMain+' — '+L.logoSub+'">'
+    + '<defs>'
+    + '<linearGradient id="kakigold" x1="0" y1="0" x2="0" y2="1">'
+    +   '<stop offset="0" stop-color="#ffe89a"/><stop offset=".32" stop-color="#f6b93b"/>'
+    +   '<stop offset=".64" stop-color="#ea6a1e"/><stop offset="1" stop-color="#a81f16"/>'
+    + '</linearGradient>'
+    + '<text id="lgtop" x="200" y="50" text-anchor="middle" class="lg-top">'+L.logoTop+'</text>'
+    + '<text id="lgmain" x="200" y="148" text-anchor="middle" class="lg-main">'+L.logoMain+'</text>'
+    + '</defs>'
+    + '<g class="lg-ext">'+ext('lgtop',7)+ext('lgmain',10)+'</g>'
+    + '<use href="#lgtop" class="lg-face"/>'
+    + '<use href="#lgmain" class="lg-face"/>'
+    + '<text x="200" y="188" text-anchor="middle" class="lg-sub">'+L.logoSub+'</text>'
+    + '</svg>';
+  return wrap;
+}
+
+// ---- Screen: Landing (full-bleed bg + floating logo + floating card) ----
 function renderLanding(dir){
   const s = document.createElement("div");
 
@@ -625,21 +671,22 @@ function renderLanding(dir){
 
   const content = document.createElement("div");
   content.className = "hero-content";
+
+  const logo = makeTitleLogo();
+
   const card = document.createElement("div");
   card.className = "floatcard";
 
-  const h = document.createElement("h1");
-  h.className = "rise"; h.textContent = DATA.landing.title;
-  const sub = document.createElement("p");
-  sub.className = "subtitle rise"; sub.style.animationDelay = "0.08s";
-  sub.textContent = DATA.landing.subtitle;
+  const body = document.createElement("p");
+  body.className = "landing-blurb rise"; body.style.animationDelay = "0.12s";
+  body.textContent = DATA.landing.body;
   const btn = document.createElement("button");
-  btn.className = "btn rise"; btn.style.animationDelay = "0.16s";
+  btn.className = "btn rise"; btn.style.animationDelay = "0.2s";
   btn.textContent = DATA.landing.button;
   btn.onclick = ()=> renderStory(0,"fwd");
 
-  card.append(h, sub, btn);
-  content.append(card);
+  card.append(body, btn);
+  content.append(logo, card);
   s.append(bg, scrim, content);
   transitionTo(s, dir || "fwd");
 }
