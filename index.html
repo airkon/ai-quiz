@@ -134,8 +134,6 @@
   .illo-1x1{width:60%;aspect-ratio:1/1;margin:0 auto;}
   /* full-bleed background placeholder — fills the whole screen */
   .illo-bleed{width:100%;height:100%;border-radius:0;}
-  /* edge-to-edge hero band placeholder — results persona */
-  .illo-hero{width:100%;aspect-ratio:4/3;border-radius:0;}
 
   /* Slow Ken Burns idle drift for full-bleed backgrounds. It only ever
      scales UP, so it never reveals a screen edge. Transform-only, 60fps. */
@@ -265,12 +263,13 @@
   .tally-text{font-family:var(--mono);font-size:17px;font-weight:bold;letter-spacing:.04em;color:var(--jungle-deep);}
 
   /* ---------- Results ---------- */
-  /* Edge-to-edge persona hero band at the top; a floating card overlaps its
-     bottom edge and scrolls. "Walk again" lives at the end of that card. */
-  .results-scroll{position:absolute;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  .results-hero{position:relative;width:100%;}
-  .results-card{position:relative;z-index:2;
-    margin:-32px 16px calc(22px + env(safe-area-inset-bottom));
+  /* Full-bleed persona portrait (subject up top); a floating card sits over
+     the faded lower area and scrolls. "Walk again" lives at the card's end. */
+  .results-scroll{position:absolute;inset:0;z-index:2;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    display:flex;flex-direction:column;}
+  .results-spacer{flex:0 0 auto;height:46dvh;}
+  .results-card{flex:0 0 auto;
+    margin:0 16px calc(22px + env(safe-area-inset-bottom));
     background:var(--card);border:3px solid var(--edge);border-radius:14px;padding:24px 20px;
     box-shadow:6px 6px 0 rgba(51,37,26,.8);}
   .persona-name{font-size:29px;line-height:1.05;margin:4px 0 6px;color:var(--jungle-deep);text-align:center;
@@ -922,12 +921,16 @@ function renderResults(dir){
   const r = computeResults();
   const s = document.createElement("div");
 
+  const bg = document.createElement("div");
+  bg.className = "screen-bg";
+  bg.append(makeIllo({id:r.persona.illo, desc:"persona portrait", src:"assets/"+r.persona.illo+".webp"}, "bleed"));
+  const scrim = document.createElement("div");
+  scrim.className = "scrim";
+
   const scroll = document.createElement("div");
   scroll.className = "results-scroll";
-
-  const hero = document.createElement("div");
-  hero.className = "results-hero";
-  hero.append(makeIllo({id:r.persona.illo, desc:"persona portrait · subject in top half"}, "hero"));
+  const spacer = document.createElement("div");
+  spacer.className = "results-spacer";
 
   const card = document.createElement("div");
   card.className = "results-card card-reveal";
@@ -977,8 +980,8 @@ function renderResults(dir){
   btn.onclick = ()=>{ buildRun(); renderLanding("back"); };
   card.append(btn);
 
-  scroll.append(hero, card);
-  s.append(scroll);
+  scroll.append(spacer, card);
+  s.append(bg, scrim, scroll);
 
   transitionTo(s, dir || "fwd");
 
