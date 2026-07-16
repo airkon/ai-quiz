@@ -347,8 +347,7 @@ const DATA = {
   story:[
     {
       illo:{ id:"ill-story-boat", desc:"bumboat arriving at jetty", src:"assets/ill-story-boat.webp" },
-      copy:"The bumboat drops you off at the jetty of Pulau Senja, a little island of jungle, mangrove, and one very tall hill. You have eight days to cross the island and reach the top.",
-      showSkip:true
+      copy:"The bumboat drops you off at the jetty of Pulau Senja, a little island of jungle, mangrove, and one very tall hill. You have eight days to cross the island and reach the top."
     },
     {
       illo:{ id:"ill-story-pack", desc:"backpack with kaya toast, paper map, Kaki gadget", src:"assets/ill-story-pack.webp" },
@@ -695,17 +694,6 @@ function renderStory(i, dir){
     else renderScene(0,"fwd");
   };
   card.append(btn);
-
-  if(beat.showSkip){
-    const skip = document.createElement("button");
-    skip.className = "link center rise";
-    skip.style.animationDelay = "0.2s";
-    skip.style.display = "block";
-    skip.style.margin = "8px auto 0";
-    skip.textContent = "Skip intro";
-    skip.onclick = ()=> renderScene(0,"fwd");
-    card.append(skip);
-  }
 
   content.append(card);
   s.append(bg, scrim, back, content);
