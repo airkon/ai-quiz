@@ -37,6 +37,9 @@
     --leaf-edge:#2c7a4f;
     --mono:"Courier New",ui-monospace,"SF Mono",Menlo,monospace;
     --logo-font:"Impact","Haettenschweiler","Arial Narrow Bold","Arial Black",sans-serif;
+    /* darker CTA orange so white text passes WCAG AA (>=4.5:1) */
+    --cta:#c8481c;
+    --cta-edge:#8f3212;
   }
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -163,14 +166,14 @@
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
     width:100%;cursor:pointer;
-    background:var(--sunset-deep);
+    background:var(--cta);
     color:#fff;font-size:17px;font-weight:bold;font-family:inherit;
     text-transform:uppercase;letter-spacing:.06em;
     padding:14px 20px;border:3px solid var(--edge);border-radius:10px;
-    box-shadow:0 6px 0 var(--sunset-edge);
+    box-shadow:0 6px 0 var(--cta-edge);
     transition:transform .07s steps(2),box-shadow .07s steps(2);
   }
-  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--sunset-edge);}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--cta-edge);}
   .btn.secondary{
     background:var(--leaf);color:#0f2f20;border-color:var(--edge);
     box-shadow:0 6px 0 var(--leaf-edge);
@@ -294,25 +297,34 @@
     opacity:0;animation:stamp .5s var(--ease) .35s forwards;}
   @keyframes stamp{0%{opacity:0;transform:scale(1.35);}60%{opacity:1;transform:scale(.96);}100%{opacity:1;transform:scale(1);}}
   body.rm .persona-name{animation:fadein .4s ease .3s forwards;}
-  .persona-desc{font-size:16px;text-align:center;color:var(--ink);margin-bottom:14px;}
+  /* AISA fluency badge (replaces the old tan tier box) + one hedge line */
+  .aisa-badge-wrap{text-align:center;margin:2px 0 6px;}
+  .aisa-badge{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:bold;
+    letter-spacing:.04em;color:var(--jungle-deep);background:var(--sand);
+    border:2px solid var(--edge);border-radius:999px;padding:5px 14px;box-shadow:3px 3px 0 rgba(51,37,26,.35);}
+  .aisa-hedge{font-size:13px;font-style:italic;color:var(--ink-soft);text-align:center;margin:0 0 16px;}
+  .persona-desc{font-size:16px;line-height:1.55;text-align:left;color:var(--ink);margin:0 0 18px;}
   .card-reveal{opacity:0;animation:reveal .6s cubic-bezier(.34,1.56,.64,1) forwards;}
   @keyframes reveal{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
   body.rm .card-reveal{animation:fadein .4s ease forwards;}
-  .aisa{
-    background:var(--sand);border:3px solid var(--edge);border-radius:10px;padding:13px 15px;
-    font-size:15px;color:var(--ink);margin:6px 0 16px;box-shadow:4px 4px 0 rgba(51,37,26,.4);
-  }
   .tipbox{
     background:linear-gradient(180deg,#eafaf0,#dff3e6);
     border:3px solid var(--leaf-edge);border-radius:10px;
     padding:14px 16px;margin-bottom:14px;box-shadow:4px 4px 0 rgba(44,122,79,.45);
   }
   .tipbox h3{margin:0 0 8px;font-family:var(--mono);font-size:13.5px;color:var(--jungle-deep);text-transform:uppercase;letter-spacing:.07em;}
-  .tipbox .tip{font-size:15px;margin:0 0 10px;}
+  .tipbox .tip{font-size:15px;line-height:1.5;margin:0 0 10px;}
   .tipbox .tip:last-child{margin-bottom:0;}
   .tip .tip-dim{font-weight:bold;color:var(--jungle);}
-  .fineprint{margin:8px 0 18px;}
-  .fineprint p{margin-bottom:8px;}
+  .tip-more{background:none;border:none;cursor:pointer;font-family:var(--mono);font-size:12.5px;
+    color:var(--jungle);text-decoration:underline;letter-spacing:.03em;padding:8px 0 0;}
+  /* Footer: framework line, course link, one-line disclaimer */
+  .results-footer{margin:2px 0 16px;}
+  .footer-line{font-size:15px;line-height:1.5;color:var(--ink);margin:0 0 8px;}
+  .footer-link{display:inline-block;font-size:15px;font-weight:bold;color:var(--cta);
+    text-decoration:none;margin:0 0 12px;}
+  .footer-link:hover{text-decoration:underline;}
+  .footer-disclaimer{font-size:13px;color:var(--ink-soft);margin:0;}
 
   /* Confetti / leaf-fall */
   #confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5;}
@@ -511,11 +523,13 @@ const DATA = {
       desc:"You cut paths that others end up following. You work near the edge of what's possible out here, with Kaki fully embedded in the journey and responsibly handled." }
   ],
 
-  // AISA tier line ({tier} is filled from the persona).
-  aisaLine:"On AISA's AI fluency spectrum, this lands you somewhere around the {tier} tier. Loosely, lah. Eight jungle questions can only tell you so much.",
+  // AISA fluency badge (fills {tier}) + one short hedge line under it.
+  aisaBadge:"≈ AISA {tier}",
+  aisaHedge:"Loosely, lah — eight jungle questions can only tell you so much.",
 
-  // Growth tip shown for the LOWEST-scoring dimension.
+  // Growth tip: shown for the single lowest-scoring dimension.
   tipHeading:"One thing to pack for your next trek",
+  tipMore:"Show one more",
   tips:{
     Delegation:"Before your next task, pause and ask: could AI take a useful first pass at this? Pick one recurring task this week and hand it over deliberately.",
     Description:"Try writing your next AI request like a short brief: the context, the constraints, and what 'done' looks like, before you hit send.",
@@ -523,9 +537,11 @@ const DATA = {
     Diligence:"Before AI-assisted work goes out the door, build in two small habits: a quick quality check, and a quick note on where AI was involved."
   },
 
-  finePrint:[
-    "The island adventure is a fun costume for Anthropic's AI Fluency Framework: Delegation, Description, Discernment and Diligence, the four habits that shape how well any of us work with AI. The AISA tier is a rough, just-for-fun estimate; the real AISA assessment is a 20-minute conversation, not eight questions about jungle fruit. This self-check is light-touch, not a formal assessment.",
-  ],
+  // Results footer.
+  footerFramework:"Based on Anthropic's AI Fluency framework — the 4Ds: Delegation, Description, Discernment, Diligence.",
+  footerLinkText:"Take the free course →",
+  footerLinkHref:"https://www.anthropic.com/ai-fluency",
+  disclaimer:"A light-touch self-check, not a formal assessment.",
 
   walkAgain:"Walk again"
 };
@@ -955,11 +971,13 @@ function computeResults(){
   const persona = DATA.personas.find(p => total >= p.min && total <= p.max)
                 || DATA.personas[DATA.personas.length-1];
 
-  // lowest-scoring dimension(s); show up to two on a tie
-  const min = Math.min(...Object.values(dims));
-  const lowDims = Object.keys(dims).filter(k => dims[k] === min).slice(0,2);
+  // dimensions ordered by subscore ascending (lowest = most room to grow);
+  // ties broken by a fixed order so the primary tip is deterministic.
+  const DIM_ORDER = ["Delegation","Description","Discernment","Diligence"];
+  const tipOrder = Object.keys(dims).sort((a,b)=>
+    (dims[a]-dims[b]) || (DIM_ORDER.indexOf(a)-DIM_ORDER.indexOf(b)));
 
-  return { total, dims, persona, lowDims };
+  return { total, dims, persona, tipOrder };
 }
 
 // ---- Screen: Results ----
@@ -986,39 +1004,64 @@ function renderResults(dir){
   name.textContent = r.persona.name;
   card.append(name);
 
+  // SECTION 1 (cont.): AISA fluency badge + one hedge line, then description.
+  const badgeWrap = document.createElement("div");
+  badgeWrap.className = "aisa-badge-wrap";
+  const badge = document.createElement("span");
+  badge.className = "aisa-badge";
+  badge.textContent = DATA.aisaBadge.replace("{tier}", r.persona.tier);
+  badgeWrap.append(badge);
+  card.append(badgeWrap);
+
+  const hedge = document.createElement("p");
+  hedge.className = "aisa-hedge";
+  hedge.textContent = DATA.aisaHedge;
+  card.append(hedge);
+
   const desc = document.createElement("p");
   desc.className = "persona-desc";
   desc.textContent = r.persona.desc;
   card.append(desc);
 
-  const aisa = document.createElement("div");
-  aisa.className = "aisa";
-  aisa.textContent = DATA.aisaLine.replace("{tier}", r.persona.tier);
-  card.append(aisa);
-
-  const tip = document.createElement("div");
-  tip.className = "tipbox";
-  const th = document.createElement("h3");
-  th.textContent = DATA.tipHeading;
-  tip.append(th);
-  r.lowDims.forEach(dim=>{
+  // SECTION 2: one tip — the single lowest-scoring dimension.
+  const makeTip = (dim)=>{
     const p = document.createElement("p");
     p.className = "tip";
     p.innerHTML = '<span class="tip-dim">'+dim+':</span> ';
     p.append(document.createTextNode(DATA.tips[dim]));
-    tip.append(p);
-  });
+    return p;
+  };
+  const tip = document.createElement("div");
+  tip.className = "tipbox";
+  const th = document.createElement("h3");
+  th.textContent = DATA.tipHeading;
+  tip.append(th, makeTip(r.tipOrder[0]));
+  if(r.tipOrder.length > 1){
+    const more = document.createElement("button");
+    more.className = "tip-more";
+    more.textContent = DATA.tipMore;
+    more.onclick = ()=>{ tip.insertBefore(makeTip(r.tipOrder[1]), more); more.remove(); };
+    tip.append(more);
+  }
   card.append(tip);
 
-  const fine = document.createElement("div");
-  fine.className = "fineprint";
-  DATA.finePrint.forEach(t=>{
-    const p = document.createElement("p");
-    p.className = "tiny";
-    p.textContent = t;
-    fine.append(p);
-  });
-  card.append(fine);
+  // SECTION 3: footer — framework line, course link, one-line disclaimer.
+  const footer = document.createElement("div");
+  footer.className = "results-footer";
+  const fLine = document.createElement("p");
+  fLine.className = "footer-line";
+  fLine.textContent = DATA.footerFramework;
+  const fLink = document.createElement("a");
+  fLink.className = "footer-link";
+  fLink.href = DATA.footerLinkHref;
+  fLink.target = "_blank";
+  fLink.rel = "noopener";
+  fLink.textContent = DATA.footerLinkText;
+  const fDis = document.createElement("p");
+  fDis.className = "footer-disclaimer";
+  fDis.textContent = DATA.disclaimer;
+  footer.append(fLine, fLink, fDis);
+  card.append(footer);
 
   const btn = document.createElement("button");
   btn.className = "btn";
