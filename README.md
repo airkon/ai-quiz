@@ -39,8 +39,14 @@ with the results card overlapping its bottom edge.
 | Asset | Where | Treatment |
 |---|---|---|
 | `ill-landing`, `ill-story-boat`, `ill-story-pack`, `ill-story-kaki` | landing + story | full-bleed ~9:19.5; subject upper-middle; bottom ~45% behind card |
-| `ill-bg-jungle` | all 8 questions + tally | one faint/desaturated full-bleed backdrop |
+| `ill-ch1` … `ill-ch8` | each chapter's scene screen | full-bleed ~9:19.5; subject upper-middle; bottom ~45% behind card |
+| `ill-bg-jungle` | all 8 question screens + tally | one faint/desaturated full-bleed backdrop |
 | `ill-persona-1` … `ill-persona-6` | results | edge-to-edge 4:3 hero band; subject in top half |
+
+Each chapter is now told over two screens: a **scene-setter** (`ill-chN` + the
+scene text) and then the **question** (prompt + options, with the scene text
+repeated faintly as a light-grey recap). The `ill-chN` art therefore uses the
+same full-bleed hero treatment as the landing/story backgrounds.
 
 ## Design notes
 

@@ -213,7 +213,9 @@
   @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(244,105,59,.5);}50%{box-shadow:0 0 0 5px rgba(244,105,59,0);}}
   body.rm .dot.active{animation:none;}
 
-  .scenario{font-size:18px;line-height:1.5;margin:2px 0 18px;color:var(--jungle-deep);}
+  /* faint recap of the scene text carried over from the scene screen */
+  .scene-recap{font-size:14px;line-height:1.5;color:#a89a86;margin:2px 0 10px;font-style:italic;}
+  .scenario{font-size:18px;line-height:1.5;margin:0 0 18px;color:var(--jungle-deep);}
   .options{display:flex;flex-direction:column;gap:12px;}
   .opt{
     text-align:left;font-family:inherit;font-size:16px;line-height:1.45;
@@ -308,7 +310,9 @@
    Change copy, questions, options, scores, personas and tips here
    without touching the app logic below it.
 
-   - Each question has a `dimension` and 4 `options`.
+   - Each question is shown as TWO screens: a scene-setter (per-chapter
+     `illo` + `scene` text), then the `prompt` with its 4 `options`.
+     Each question also belongs to a `dimension`.
    - Each option has `text` and a `score` (1–4). Scores are tied to
      the option's content, not its on-screen position (order is
      randomized each playthrough).
@@ -347,7 +351,9 @@ const DATA = {
     {
       chapter:"Chapter 1 — The jetty",
       dimension:"Delegation",
-      scenario:"It's day one, and you need a route across the island. Kaki's route-scan can chart a path in seconds. How do you plan today's route?",
+      illo:{ id:"ill-ch1", desc:"day one at the jetty, choosing a route" },
+      scene:"It's day one, and you need a route across the island. Kaki's route-scan can chart a path in seconds.",
+      prompt:"How do you plan today's route?",
       options:[
         { text:"You run the scan and follow whatever route it draws. Kaki probably knows best, so you just start walking.", score:1 },
         { text:"You stick to your paper map, like you always do. The scan is probably useful, but you've never actually tried it out.", score:2 },
@@ -358,7 +364,9 @@ const DATA = {
     {
       chapter:"Chapter 2 — The mangrove crossing",
       dimension:"Delegation",
-      scenario:"A wide mangrove channel blocks the way, too deep to wade across. Kaki can generate a step-by-step plan for building a raft from what's around you. What do you do?",
+      illo:{ id:"ill-ch2", desc:"a wide mangrove channel blocking the way" },
+      scene:"A wide mangrove channel blocks the way, too deep to wade across. Kaki can generate a step-by-step plan for building a raft from what's around you.",
+      prompt:"What do you do?",
       options:[
         { text:"You follow Kaki's build plan step by step, lash everything together exactly as described, and push off straight away. The plan looked confident, and Kaki has been right before.", score:1 },
         { text:"You skip the plan completely and build the raft by hand, the way you learnt in NS. Machines don't know rafts.", score:2 },
@@ -369,7 +377,9 @@ const DATA = {
     {
       chapter:"Chapter 3 — Making camp",
       dimension:"Description",
-      scenario:"The sun is setting and you need Kaki to find tonight's campsite. What do you type into it?",
+      illo:{ id:"ill-ch3", desc:"sun setting, time to make camp" },
+      scene:"The sun is setting and you need Kaki to find tonight's campsite.",
+      prompt:"What do you type into it?",
       options:[
         { text:"\"Please find me a really nice spot to camp tonight, somewhere good, you know what I mean, thanks!\"", score:1 },
         { text:"\"Find a campsite somewhere near the trail.\"", score:2 },
@@ -380,7 +390,9 @@ const DATA = {
     {
       chapter:"Chapter 4 — Rocky ground",
       dimension:"Description",
-      scenario:"You hike to Kaki's recommended campsite, but the ground turns out far too rocky to pitch a tent. What do you do?",
+      illo:{ id:"ill-ch4", desc:"a campsite too rocky to pitch a tent" },
+      scene:"You hike to Kaki's recommended campsite, but the ground turns out far too rocky to pitch a tent.",
+      prompt:"What do you do?",
       options:[
         { text:"You pitch the tent there anyway and spend the night rolling around on rocks. Kaki chose this spot, so it must be the best one available.", score:1 },
         { text:"You ask Kaki to find another spot, and keep asking until one works out.", score:2 },
@@ -391,7 +403,9 @@ const DATA = {
     {
       chapter:"Chapter 5 — The jungle fruit",
       dimension:"Discernment",
-      scenario:"Deep in the forest, Kaki scans a cluster of unfamiliar fruit and reports that they're safe to eat. What do you do?",
+      illo:{ id:"ill-ch5", desc:"a cluster of unfamiliar jungle fruit" },
+      scene:"Deep in the forest, Kaki scans a cluster of unfamiliar fruit and reports that they're safe to eat.",
+      prompt:"What do you do?",
       options:[
         { text:"You eat them straight away. Kaki scanned them and said safe, so that settles it.", score:1 },
         { text:"You give them a good look and a careful sniff yourself, and they seem perfectly fine to you, so you go ahead and eat them.", score:2 },
@@ -402,7 +416,9 @@ const DATA = {
     {
       chapter:"Chapter 6 — Off course",
       dimension:"Discernment",
-      scenario:"Unknown to you, Kaki's compass glitches after breakfast and starts pointing you down the wrong trail. When do you catch it?",
+      illo:{ id:"ill-ch6", desc:"Kaki's compass glitching on the trail" },
+      scene:"Unknown to you, Kaki's compass glitches after breakfast and starts pointing you down the wrong trail.",
+      prompt:"When do you catch it?",
       options:[
         { text:"Not until much later, when you reach a landmark that's clearly on the wrong side of the island. That mistake costs you half a day of walking.", score:1 },
         { text:"Something feels a bit off partway through, but the compass says you're fine, so you keep walking a while more before checking.", score:2 },
@@ -413,7 +429,9 @@ const DATA = {
     {
       chapter:"Chapter 7 — The hilltop",
       dimension:"Diligence",
-      scenario:"You finally reach the top of the island's one very tall hill, and send your trek report to the expedition group chat. How do you describe the journey?",
+      illo:{ id:"ill-ch7", desc:"the summit, sending a trek report" },
+      scene:"You finally reach the top of the island's one very tall hill, and send your trek report to the expedition group chat.",
+      prompt:"How do you describe the journey?",
       options:[
         { text:"You write up the whole journey as your own navigation work from start to finish, and Kaki doesn't appear anywhere in it.", score:1 },
         { text:"You keep the report simple, and you'll explain Kaki's role honestly if anyone in the group asks.", score:2 },
@@ -424,7 +442,9 @@ const DATA = {
     {
       chapter:"Chapter 8 — The data prompt",
       dimension:"Diligence",
-      scenario:"On the last morning, a prompt pops up on Kaki's screen: allow it to upload your GPS trail and photos to help improve future treks?",
+      illo:{ id:"ill-ch8", desc:"a data-upload prompt on Kaki's screen" },
+      scene:"On the last morning, a prompt pops up on Kaki's screen:",
+      prompt:"Allow it to upload your GPS trail and photos to help improve future treks?",
       options:[
         { text:"You tap \"Allow all\" without reading further, and off everything goes.", score:1 },
         { text:"You allow the basic stuff, since sharing a bit of data seems harmless, and you'd rather not read through the whole permissions list.", score:2 },
@@ -656,7 +676,7 @@ function renderStory(i, dir){
   btn.textContent = "Continue";
   btn.onclick = ()=>{
     if(i < DATA.story.length - 1) renderStory(i+1,"fwd");
-    else renderQuestion(0,"fwd");
+    else renderScene(0,"fwd");
   };
   card.append(btn);
 
@@ -667,7 +687,7 @@ function renderStory(i, dir){
     skip.style.display = "block";
     skip.style.margin = "8px auto 0";
     skip.textContent = "Skip intro";
-    skip.onclick = ()=> renderQuestion(0,"fwd");
+    skip.onclick = ()=> renderScene(0,"fwd");
     card.append(skip);
   }
 
@@ -676,7 +696,55 @@ function renderStory(i, dir){
   transitionTo(s, dir || "fwd");
 }
 
-// ---- Screen: Question ----
+// ---- Screen: Chapter scene-setter (illustration + scene text) ----
+function renderScene(i, dir){
+  state.qIndex = i;
+  const q = DATA.questions[i];
+  const s = document.createElement("div");
+
+  const bg = document.createElement("div");
+  bg.className = "screen-bg";
+  bg.append(makeIllo(q.illo, "bleed", "kenburns"));
+  const scrim = document.createElement("div");
+  scrim.className = "scrim";
+
+  // Back arrow: to the previous chapter's question, or the last story beat.
+  const back = document.createElement("button");
+  back.className = "backarrow top-back";
+  back.setAttribute("aria-label","Go back");
+  back.innerHTML = "&#8592;";
+  back.onclick = ()=>{
+    if(i > 0) renderQuestion(i-1,"back");
+    else renderStory(DATA.story.length-1,"back");
+  };
+
+  const content = document.createElement("div");
+  content.className = "hero-content";
+  const card = document.createElement("div");
+  card.className = "floatcard";
+
+  const chap = document.createElement("div");
+  chap.className = "chapter rise";
+  chap.textContent = "Q" + (i+1) + " · " + q.chapter;
+
+  const scene = document.createElement("p");
+  scene.className = "story-copy rise";
+  scene.style.animationDelay = "0.06s";
+  scene.textContent = q.scene;
+
+  const btn = document.createElement("button");
+  btn.className = "btn rise";
+  btn.style.animationDelay = "0.14s";
+  btn.textContent = "Continue";
+  btn.onclick = ()=> renderQuestion(i,"fwd");
+
+  card.append(chap, scene, btn);
+  content.append(card);
+  s.append(bg, scrim, back, content);
+  transitionTo(s, dir || "fwd");
+}
+
+// ---- Screen: Question (prompt + options, with a faint scene recap) ----
 function renderQuestion(i, dir){
   state.qIndex = i;
   const q = DATA.questions[i];
@@ -697,10 +765,7 @@ function renderQuestion(i, dir){
   back.className = "backarrow";
   back.setAttribute("aria-label","Go back");
   back.innerHTML = "&#8592;";
-  back.onclick = ()=>{
-    if(i > 0) renderQuestion(i-1,"back");
-    else renderStory(DATA.story.length-1,"back");
-  };
+  back.onclick = ()=> renderScene(i,"back");
   const dots = document.createElement("div");
   dots.className = "dots";
   for(let d=0; d<DATA.questions.length; d++){
@@ -716,10 +781,13 @@ function renderQuestion(i, dir){
   const chap = document.createElement("div");
   chap.className = "chapter";
   chap.textContent = "Q" + (i+1) + " · " + q.chapter;
-  const scen = document.createElement("p");
-  scen.className = "scenario";
-  scen.textContent = q.scenario;
-  content.append(chap, scen);
+  const recap = document.createElement("p");
+  recap.className = "scene-recap";
+  recap.textContent = q.scene;
+  const prompt = document.createElement("p");
+  prompt.className = "scenario";
+  prompt.textContent = q.prompt;
+  content.append(chap, recap, prompt);
 
   const list = document.createElement("div");
   list.className = "options";
@@ -757,7 +825,7 @@ function selectOption(card, opt, cards, i){
 
   // ~400ms highlight, then auto-advance
   setTimeout(()=>{
-    if(i < DATA.questions.length - 1) renderQuestion(i+1,"fwd");
+    if(i < DATA.questions.length - 1) renderScene(i+1,"fwd");
     else renderTally();
   }, 420);
 }
