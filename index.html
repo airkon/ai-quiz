@@ -191,7 +191,9 @@
      cards act as the floating content. */
   .q-content{position:absolute;inset:0;z-index:1;overflow-y:auto;
     -webkit-overflow-scrolling:touch;padding:22px 20px 26px;}
-  .qtop{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  /* 3-column grid keeps the dots centred on screen: the empty right column
+     mirrors the back-arrow width so the middle (dots) column stays centred. */
+  .qtop{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:10px;margin-bottom:14px;}
   .backarrow{
     flex:0 0 auto;width:42px;height:42px;border-radius:10px;
     border:3px solid var(--edge);background:var(--sand);color:var(--jungle-deep);
@@ -213,9 +215,7 @@
   @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(244,105,59,.5);}50%{box-shadow:0 0 0 5px rgba(244,105,59,0);}}
   body.rm .dot.active{animation:none;}
 
-  /* faint recap of the scene text carried over from the scene screen */
-  .scene-recap{font-size:14px;line-height:1.5;color:#a89a86;margin:2px 0 10px;font-style:italic;}
-  .scenario{font-size:18px;line-height:1.5;margin:0 0 18px;color:var(--jungle-deep);}
+  .scenario{font-size:18px;line-height:1.5;margin:2px 0 18px;color:var(--jungle-deep);}
   .options{display:flex;flex-direction:column;gap:12px;}
   .opt{
     text-align:left;font-family:inherit;font-size:16px;line-height:1.45;
@@ -381,10 +381,10 @@ const DATA = {
       scene:"The sun is setting and you need Kaki to find tonight's campsite.",
       prompt:"What do you type into it?",
       options:[
-        { text:"\"Please find me a really nice spot to camp tonight, somewhere good, you know what I mean, thanks!\"", score:1 },
-        { text:"\"Find a campsite somewhere near the trail.\"", score:2 },
-        { text:"\"Find a flat campsite near fresh water.\"", score:3 },
-        { text:"\"Find a flat campsite near fresh water, sheltered from wind. We have two tents.\"", score:4 }
+        { text:"Please find me a really nice spot to camp tonight, somewhere good, you know what I mean, thanks!", score:1 },
+        { text:"Find a campsite somewhere near the trail.", score:2 },
+        { text:"Find a flat campsite near fresh water.", score:3 },
+        { text:"Find a flat campsite near fresh water, sheltered from wind. We have two tents.", score:4 }
       ]
     },
     {
@@ -725,7 +725,7 @@ function renderScene(i, dir){
 
   const chap = document.createElement("div");
   chap.className = "chapter rise";
-  chap.textContent = "Q" + (i+1) + " · " + q.chapter;
+  chap.textContent = q.chapter;
 
   const scene = document.createElement("p");
   scene.className = "story-copy rise";
@@ -778,16 +778,10 @@ function renderQuestion(i, dir){
   top.append(back, dots);
   content.append(top);
 
-  const chap = document.createElement("div");
-  chap.className = "chapter";
-  chap.textContent = "Q" + (i+1) + " · " + q.chapter;
-  const recap = document.createElement("p");
-  recap.className = "scene-recap";
-  recap.textContent = q.scene;
   const prompt = document.createElement("p");
   prompt.className = "scenario";
   prompt.textContent = q.prompt;
-  content.append(chap, recap, prompt);
+  content.append(prompt);
 
   const list = document.createElement("div");
   list.className = "options";
