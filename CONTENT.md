@@ -13,7 +13,7 @@ _A readable export of every piece of copy in the quiz. Auto-generated from the a
 ## Story intro (3 beats)
 
 **Beat 1**  
-The bumboat drops you off at the jetty of Pulau Senja, a little island of jungle, mangrove, and one very tall hill. You have eight days to cross the island and reach the top.
+The bumboat drops you off at the jetty of Pulau Senja, a little island of jungle, mangrove, and one very tall hill. You're leading a small trek team, with eight days to cross the island and reach the top.
 
 **Beat 2**  
 Inside your pack: some kaya toast for the road, a trusty paper map, and one piece of new equipment called Kaki, an AI-powered trail gadget. (And yes, it's a machine, not a friend. The name just stuck.)
@@ -41,7 +41,7 @@ Each question is two screens: a **scene** (illustration + setup) then the **prom
 **Prompt:** What do you do?
 
 - _(1)_ You follow the plan and push off straight away. Kaki has been right before.
-- _(2)_ You skip the plan and build it the way you learnt in NS. Machines don't know rafts.
+- _(2)_ You skip the plan and build it the way you learnt back in school camp. Machines don't know rafts.
 - _(3)_ You follow the plan as written, then test the raft in shallow water first.
 - _(4)_ You adjust the plan to fit the gear your team actually brought, then test it in shallow water first.
 
@@ -71,9 +71,9 @@ Each question is two screens: a **scene** (illustration + setup) then the **prom
 **Prompt:** What do you do?
 
 - _(1)_ You eat them straight away. Kaki said safe, means safe.
-- _(2)_ You inspect them yourself. Look okay, smell okay, so you makan.
-- _(3)_ You check the fruit against your own field guide before eating anything.
-- _(4)_ You check the field guide, and remember Kaki's scanner has mixed up similar-looking fruit before.
+- _(2)_ You give them a good look and a sniff. Seem fine, so you makan.
+- _(3)_ You check the fruit against your field guide first, just to be sure.
+- _(4)_ You check the guide extra carefully. Kaki has mixed up lookalike fruit before.
 
 ### Q6 · Chapter 6 — Off course
 **Dimension:** Discernment  
