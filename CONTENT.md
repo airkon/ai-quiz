@@ -133,7 +133,36 @@ Shown for the lowest-scoring dimension (up to two on a tie):
 - **Diligence:** Before AI-assisted work goes out the door, build in two small habits: a quick quality check, and a quick note on where AI was involved.
 
 **Framework footer:** This quiz is based on Anthropic's AI Fluency framework — the 4Ds: Delegation, Description, Discernment, Diligence.  
+_("the 4Ds" is a tappable link that opens the 4Ds sheet.)_
+
 **Disclaimer:** A light-touch self-check.  
-**See-all CTA:** See all personas  
-**Persona list title:** Meet all the trekkers  
+**Persona sheet link:** See all 6 trekkers → _(text link under the persona description)_  
+**Persona sheet title:** Meet all the trekkers  
 **Reset button:** Walk again
+
+## The 4Ds sheet
+
+Opened from the "the 4Ds" link in the footer. The player's lowest-scoring
+dimension is tagged **your growth area**.
+
+**Title:** The 4Ds of AI fluency
+
+### Delegation
+**Deciding what to hand to the AI, and what to keep human.**
+
+The thinking that happens before you start. You assess the problem, choose the right tool for it, and split the work between yourself and the AI. It is about designing a workflow rather than offloading a task wholesale. Its three parts are problem awareness, platform awareness, and task delegation.
+
+### Description
+**Communicating what you want clearly enough to get it.**
+
+How you instruct the AI. It covers product description (what you want created), process description (how the AI should approach it), and performance description (how it should behave while collaborating). Prompting technique sits here: context, examples, constraints, step-by-step breakdowns, and reasoning prompts.
+
+### Discernment
+**Critically evaluating what comes back.**
+
+Quality control, and it mirrors Description: product discernment (is the output good?), process discernment (was the approach sound?), and performance discernment (how did it behave?). The core principle is that critical thinking cannot be outsourced, however confident the output sounds. Description and Discernment form an iterative loop.
+
+### Diligence
+**Using AI responsibly and owning the result.**
+
+The ethical and accountability layer, covering the part after the output. It spans thoughtful choice of systems, transparency about where AI was involved, and taking responsibility for what you ship. Diligence matters most as systems become more autonomous and human oversight becomes structural rather than moment-to-moment.

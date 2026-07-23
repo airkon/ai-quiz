@@ -297,7 +297,7 @@
     opacity:0;animation:stamp .5s var(--ease) .35s forwards;}
   @keyframes stamp{0%{opacity:0;transform:scale(1.35);}60%{opacity:1;transform:scale(.96);}100%{opacity:1;transform:scale(1);}}
   body.rm .persona-name{animation:fadein .4s ease .3s forwards;}
-  .persona-desc{font-size:16px;line-height:1.55;text-align:left;color:var(--ink);margin:8px 0 18px;}
+  .persona-desc{font-size:16px;line-height:1.55;text-align:left;color:var(--ink);margin:8px 0 10px;}
   .results-card .btn + .btn{margin-top:10px;}
   .card-reveal{opacity:0;animation:reveal .6s cubic-bezier(.34,1.56,.64,1) forwards;}
   @keyframes reveal{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
@@ -319,24 +319,34 @@
   .footer-disclaimer{font-size:13px;color:var(--ink-soft);margin:0;}
 
   /* Overlay: full persona list */
-  .persona-list-overlay{position:absolute;inset:0;z-index:50;overflow-y:auto;
+  .sheet-overlay{position:absolute;inset:0;z-index:50;overflow-y:auto;
     background:rgba(30,15,5,.55);padding:24px 16px calc(24px + env(safe-area-inset-bottom));
     animation:fadein .22s ease;}
-  body.rm .persona-list-overlay{animation:none;}
-  .persona-list{position:relative;background:var(--card);border:3px solid var(--edge);
+  body.rm .sheet-overlay{animation:none;}
+  .sheet{position:relative;background:var(--card);border:3px solid var(--edge);
     border-radius:14px;padding:22px 20px;box-shadow:6px 6px 0 rgba(51,37,26,.8);}
-  .persona-list-title{font-size:20px;color:var(--jungle-deep);margin:0 0 10px;padding-right:36px;}
-  .persona-list-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:9px;
+  .sheet-title{font-size:20px;color:var(--jungle-deep);margin:0 0 10px;padding-right:36px;}
+  .sheet-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:9px;
     border:2px solid var(--edge);background:var(--sand);color:var(--jungle-deep);font-size:22px;line-height:1;
     cursor:pointer;display:flex;align-items:center;justify-content:center;}
-  .pl-item{padding:12px 0;border-bottom:2px solid var(--sand-deep);}
-  .pl-item:last-child{border-bottom:none;padding-bottom:0;}
-  .pl-item.current{background:#fff3e6;margin:0 -20px;padding:12px 20px;}
-  .pl-name{font-weight:bold;font-size:16px;color:var(--jungle-deep);margin:0 0 3px;}
-  .pl-short{font-size:14px;line-height:1.45;color:var(--ink);margin:0;}
-  .pl-you{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:bold;text-transform:uppercase;
+  .sheet-item{padding:12px 0;border-bottom:2px solid var(--sand-deep);}
+  .sheet-item:last-child{border-bottom:none;padding-bottom:0;}
+  .sheet-item.current{background:#fff3e6;margin:0 -20px;padding:12px 20px;}
+  .sheet-name{font-weight:bold;font-size:16px;color:var(--jungle-deep);margin:0 0 3px;}
+  .sheet-short{font-size:14px;line-height:1.45;color:var(--ink);margin:0;}
+  .sheet-tag{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:bold;text-transform:uppercase;
     letter-spacing:.05em;color:#fff;background:var(--cta);border:2px solid var(--edge);border-radius:999px;
     padding:1px 8px;vertical-align:middle;}
+  /* 4Ds sheet: a lead line then the fuller explanation */
+  .fd-summary{font-size:15px;font-weight:bold;line-height:1.45;color:var(--jungle);margin:0 0 6px;}
+  .fd-detail{font-size:13.5px;line-height:1.55;color:var(--ink-soft);margin:0;}
+
+  /* Contextual text links (replace the old secondary buttons) */
+  .inline-link{display:inline;background:none;border:none;padding:0;margin:0;font:inherit;
+    color:var(--cta);font-weight:bold;text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
+  .persona-more{display:inline-block;background:none;border:none;padding:0;margin:0 0 18px;
+    font-family:inherit;font-size:15px;font-weight:bold;color:var(--cta);
+    text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
 
   /* Confetti / leaf-fall */
   #confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5;}
@@ -552,12 +562,33 @@ const DATA = {
   },
 
   // Results footer.
-  footerFramework:"This quiz is based on Anthropic's AI Fluency framework — the 4Ds: Delegation, Description, Discernment, Diligence.",
+  // Footer sentence. {4Ds} is replaced by a tappable link that opens the 4Ds sheet.
+  footerFramework:"This quiz is based on Anthropic's AI Fluency framework — {4Ds}: Delegation, Description, Discernment, Diligence.",
+  footerFrameworkLink:"the 4Ds",
   disclaimer:"A light-touch self-check.",
 
-  // "See all personas" list.
-  seeAllCta:"See all personas",
+  // Persona sheet, opened from a text link under the persona description.
+  seeAllLink:"See all 6 trekkers →",
   personaListTitle:"Meet all the trekkers",
+
+  // 4Ds sheet, opened from the footer link. The player's lowest-scoring
+  // dimension is tagged as their growth area.
+  fourDsTitle:"The 4Ds of AI fluency",
+  fourDsTag:"your growth area",
+  fourDs:[
+    { name:"Delegation",
+      summary:"Deciding what to hand to the AI, and what to keep human.",
+      detail:"The thinking that happens before you start. You assess the problem, choose the right tool for it, and split the work between yourself and the AI. It is about designing a workflow rather than offloading a task wholesale. Its three parts are problem awareness, platform awareness, and task delegation." },
+    { name:"Description",
+      summary:"Communicating what you want clearly enough to get it.",
+      detail:"How you instruct the AI. It covers product description (what you want created), process description (how the AI should approach it), and performance description (how it should behave while collaborating). Prompting technique sits here: context, examples, constraints, step-by-step breakdowns, and reasoning prompts." },
+    { name:"Discernment",
+      summary:"Critically evaluating what comes back.",
+      detail:"Quality control, and it mirrors Description: product discernment (is the output good?), process discernment (was the approach sound?), and performance discernment (how did it behave?). The core principle is that critical thinking cannot be outsourced, however confident the output sounds. Description and Discernment form an iterative loop." },
+    { name:"Diligence",
+      summary:"Using AI responsibly and owning the result.",
+      detail:"The ethical and accountability layer, covering the part after the output. It spans thoughtful choice of systems, transparency about where AI was involved, and taking responsibility for what you ship. Diligence matters most as systems become more autonomous and human oversight becomes structural rather than moment-to-moment." }
+  ],
 
   walkAgain:"Walk again"
 };
@@ -1025,6 +1056,13 @@ function renderResults(dir){
   desc.textContent = r.persona.desc;
   card.append(desc);
 
+  // Contextual link -> persona sheet (replaces the old secondary button).
+  const moreLink = document.createElement("button");
+  moreLink.className = "persona-more";
+  moreLink.textContent = DATA.seeAllLink;
+  moreLink.onclick = ()=> showPersonaList(r.persona.illo);
+  card.append(moreLink);
+
   // SECTION 2: one tip — the single lowest-scoring dimension.
   const makeTip = (dim)=>{
     const p = document.createElement("p");
@@ -1050,20 +1088,21 @@ function renderResults(dir){
   // SECTION 3: footer — framework line, course link, one-line disclaimer.
   const footer = document.createElement("div");
   footer.className = "results-footer";
+  // Framework sentence with "{4Ds}" swapped for a contextual link.
   const fLine = document.createElement("p");
   fLine.className = "footer-line";
-  fLine.textContent = DATA.footerFramework;
+  const fParts = DATA.footerFramework.split("{4Ds}");
+  const fdLink = document.createElement("button");
+  fdLink.className = "inline-link";
+  fdLink.textContent = DATA.footerFrameworkLink;
+  fdLink.onclick = ()=> showFourDs(r.tipOrder[0]);
+  fLine.append(document.createTextNode(fParts[0]), fdLink);
+  if(fParts[1]) fLine.append(document.createTextNode(fParts[1]));
   const fDis = document.createElement("p");
   fDis.className = "footer-disclaimer";
   fDis.textContent = DATA.disclaimer;
   footer.append(fLine, fDis);
   card.append(footer);
-
-  const seeAll = document.createElement("button");
-  seeAll.className = "btn secondary";
-  seeAll.textContent = DATA.seeAllCta;
-  seeAll.onclick = ()=> showPersonaList(r.persona.illo);
-  card.append(seeAll);
 
   const btn = document.createElement("button");
   btn.className = "btn";
@@ -1080,46 +1119,76 @@ function renderResults(dir){
   if(!RM) leafBurst();
 }
 
-// ---- Overlay: full list of personas with a short description each ----
-function showPersonaList(currentIllo){
+// ---- Shared bottom-sheet overlay (used by the persona list and the 4Ds) ----
+function makeSheet(title){
   const overlay = document.createElement("div");
-  overlay.className = "persona-list-overlay";
+  overlay.className = "sheet-overlay";
   overlay.onclick = (e)=>{ if(e.target === overlay) overlay.remove(); };
 
   const card = document.createElement("div");
-  card.className = "persona-list";
+  card.className = "sheet";
 
   const close = document.createElement("button");
-  close.className = "persona-list-close";
+  close.className = "sheet-close";
   close.setAttribute("aria-label","Close");
   close.innerHTML = "&times;";
   close.onclick = ()=> overlay.remove();
 
   const h = document.createElement("h2");
-  h.className = "persona-list-title";
-  h.textContent = DATA.personaListTitle;
+  h.className = "sheet-title";
+  h.textContent = title;
   card.append(close, h);
+  overlay.append(card);
+  return { overlay, card };
+}
+
+// Adds a name row, optionally tagged (e.g. "you" / "your growth area").
+function sheetName(text, tagText){
+  const name = document.createElement("div");
+  name.className = "sheet-name";
+  name.textContent = text;
+  if(tagText){
+    const tag = document.createElement("span");
+    tag.className = "sheet-tag";
+    tag.textContent = tagText;
+    name.append(" ", tag);
+  }
+  return name;
+}
+
+// ---- Sheet: the 4Ds of AI fluency ----
+function showFourDs(growthDim){
+  const { overlay, card } = makeSheet(DATA.fourDsTitle);
+  DATA.fourDs.forEach(d=>{
+    const isGrowth = d.name === growthDim;
+    const item = document.createElement("div");
+    item.className = "sheet-item" + (isGrowth ? " current" : "");
+    const summary = document.createElement("p");
+    summary.className = "fd-summary";
+    summary.textContent = d.summary;
+    const detail = document.createElement("p");
+    detail.className = "fd-detail";
+    detail.textContent = d.detail;
+    item.append(sheetName(d.name, isGrowth ? DATA.fourDsTag : null), summary, detail);
+    card.append(item);
+  });
+  document.getElementById("app").append(overlay);
+}
+
+// ---- Sheet: full list of personas with a short description each ----
+function showPersonaList(currentIllo){
+  const { overlay, card } = makeSheet(DATA.personaListTitle);
 
   DATA.personas.forEach(p=>{
     const item = document.createElement("div");
-    item.className = "pl-item" + (p.illo === currentIllo ? " current" : "");
-    const name = document.createElement("div");
-    name.className = "pl-name";
-    name.textContent = p.name;
-    if(p.illo === currentIllo){
-      const you = document.createElement("span");
-      you.className = "pl-you";
-      you.textContent = "you";
-      name.append(" ", you);
-    }
+    item.className = "sheet-item" + (p.illo === currentIllo ? " current" : "");
     const short = document.createElement("p");
-    short.className = "pl-short";
+    short.className = "sheet-short";
     short.textContent = p.short;
-    item.append(name, short);
+    item.append(sheetName(p.name, p.illo === currentIllo ? "you" : null), short);
     card.append(item);
   });
 
-  overlay.append(card);
   document.getElementById("app").append(overlay);
 }
 
