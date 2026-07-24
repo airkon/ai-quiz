@@ -343,7 +343,8 @@
 
   /* Contextual text links (replace the old secondary buttons) */
   .inline-link{display:inline;background:none;border:none;padding:0;margin:0;font:inherit;
-    color:var(--cta);font-weight:bold;text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
+    text-align:inherit;color:var(--cta);font-weight:bold;text-decoration:underline;
+    text-underline-offset:2px;cursor:pointer;}
   .persona-more{display:inline-block;background:none;border:none;padding:0;margin:0 0 18px;
     font-family:inherit;font-size:15px;font-weight:bold;color:var(--cta);
     text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
@@ -563,8 +564,8 @@ const DATA = {
 
   // Results footer.
   // Footer sentence. {4Ds} is replaced by a tappable link that opens the 4Ds sheet.
-  footerFramework:"This quiz is based on Anthropic's AI Fluency framework — {4Ds}: Delegation, Description, Discernment, Diligence.",
-  footerFrameworkLink:"the 4Ds",
+  footerFramework:"This quiz is based on Anthropic's AI Fluency framework — the {4Ds}.",
+  footerFrameworkLink:"4Ds: Delegation, Description, Discernment, Diligence",
   disclaimer:"A light-touch self-check.",
 
   // Persona sheet, opened from a text link under the persona description.
@@ -1092,10 +1093,13 @@ function renderResults(dir){
   const fLine = document.createElement("p");
   fLine.className = "footer-line";
   const fParts = DATA.footerFramework.split("{4Ds}");
-  const fdLink = document.createElement("button");
+  const fdLink = document.createElement("a");
   fdLink.className = "inline-link";
+  fdLink.setAttribute("role","button");
+  fdLink.setAttribute("tabindex","0");
   fdLink.textContent = DATA.footerFrameworkLink;
   fdLink.onclick = ()=> showFourDs(r.tipOrder[0]);
+  fdLink.onkeydown = (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); showFourDs(r.tipOrder[0]); } };
   fLine.append(document.createTextNode(fParts[0]), fdLink);
   if(fParts[1]) fLine.append(document.createTextNode(fParts[1]));
   const fDis = document.createElement("p");

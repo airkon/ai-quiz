@@ -133,7 +133,7 @@ Shown for the lowest-scoring dimension (up to two on a tie):
 - **Diligence:** Before AI-assisted work goes out the door, build in two small habits: a quick quality check, and a quick note on where AI was involved.
 
 **Framework footer:** This quiz is based on Anthropic's AI Fluency framework — the 4Ds: Delegation, Description, Discernment, Diligence.  
-_("the 4Ds" is a tappable link that opens the 4Ds sheet.)_
+_("4Ds: Delegation, Description, Discernment, Diligence" is a tappable link that opens the 4Ds sheet.)_
 
 **Disclaimer:** A light-touch self-check.  
 **Persona sheet link:** See all 6 trekkers → _(text link under the persona description)_  
