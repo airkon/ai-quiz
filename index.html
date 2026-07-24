@@ -72,8 +72,23 @@
   }
   @media (min-width:520px){
     body{padding:24px;}
-    #app{min-height:min(880px,calc(100dvh - 48px));border-radius:30px;}
+    #app{min-height:min(880px,calc(100dvh - 48px));border-radius:30px;z-index:1;}
   }
+
+  /* Desktop-only illustrated backdrop behind the phone column. Two layers
+     crossfade: the poster on landing/results, the forest in between.
+     Hidden on phones, where the column fills the screen anyway. */
+  #backdrop{display:none;}
+  @media (min-width:520px){
+    #backdrop{display:block;position:fixed;inset:0;z-index:0;pointer-events:none;}
+    .bd{position:absolute;inset:0;background-size:cover;background-position:center;
+      opacity:0;transition:opacity .6s ease;}
+    .bd-poster{background-image:url("assets/bg-desktop-poster.webp");}
+    .bd-forest{background-image:url("assets/bg-desktop-forest.webp");}
+    body.mode-poster .bd-poster{opacity:1;}
+    body.mode-forest .bd-forest{opacity:1;}
+  }
+  body.rm .bd{transition:none;}
 
   /* Portrait-only: on landscape phones, hide the app and ask to rotate.
      Gated on a short height so desktop/tablet landscape is unaffected. */
@@ -359,6 +374,12 @@
 </style>
 </head>
 <body>
+  <!-- Desktop-only illustrated backdrop behind the phone column. -->
+  <div id="backdrop" aria-hidden="true">
+    <div class="bd bd-forest"></div>
+    <div class="bd bd-poster"></div>
+  </div>
+
   <div id="app">
     <div id="stage"></div>
     <div id="confetti" aria-hidden="true"></div>
@@ -673,6 +694,13 @@ function transitionTo(node, dir){
   setTimeout(done, 700);
 }
 
+// Desktop backdrop: "poster" on the landing + results, "forest" in between.
+// Does nothing visible on phones (the backdrop is hidden under 520px).
+function setBackdrop(mode){
+  document.body.classList.toggle("mode-poster", mode === "poster");
+  document.body.classList.toggle("mode-forest", mode === "forest");
+}
+
 // ---- Illustration builder ----
 // If the illo has a `src`, render the real image; otherwise render the
 // labelled dashed placeholder. A broken/missing image falls back to the
@@ -724,6 +752,7 @@ function makeTitleLogo(){
 
 // ---- Screen: Landing (full-bleed bg + floating logo + floating card) ----
 function renderLanding(dir){
+  setBackdrop("poster");
   const s = document.createElement("div");
 
   const bg = document.createElement("div");
@@ -756,6 +785,7 @@ function renderLanding(dir){
 
 // ---- Screen: Story beat (full-bleed bg + floating card) ----
 function renderStory(i, dir){
+  setBackdrop("forest");
   const beat = DATA.story[i];
   const s = document.createElement("div");
 
@@ -811,6 +841,7 @@ function renderStory(i, dir){
 
 // ---- Screen: Chapter scene-setter (illustration + scene text) ----
 function renderScene(i, dir){
+  setBackdrop("forest");
   state.qIndex = i;
   const q = DATA.questions[i];
   const s = document.createElement("div");
@@ -859,6 +890,7 @@ function renderScene(i, dir){
 
 // ---- Screen: Question (prompt + options, with a faint scene recap) ----
 function renderQuestion(i, dir){
+  setBackdrop("forest");
   state.qIndex = i;
   const q = DATA.questions[i];
   const opts = state.order[i];
@@ -938,6 +970,7 @@ function selectOption(card, opt, cards, i){
 
 // ---- Screen: Tallying interstitial ----
 function renderTally(){
+  setBackdrop("forest");
   const s = document.createElement("div");
 
   const bg = document.createElement("div");
@@ -1030,6 +1063,7 @@ function computeResults(){
 
 // ---- Screen: Results ----
 function renderResults(dir){
+  setBackdrop("poster");
   const r = computeResults();
   const s = document.createElement("div");
 
